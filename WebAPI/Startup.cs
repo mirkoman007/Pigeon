@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebAPI.Data;
 
 namespace WebAPI
 {
@@ -27,6 +28,10 @@ namespace WebAPI
         {
 
             services.AddControllers();
+
+            services.AddScoped<PigeonContext, PigeonContext>();
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
