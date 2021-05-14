@@ -55,15 +55,15 @@ namespace WebAPI.Models
         public int? UserTypeId { get; set; }
         [Column("GenderID")]
         public int? GenderId { get; set; }
-        [Column("LocationID")]
-        public int? LocationId { get; set; }
+        [Column("CityID")]
+        public int? CityId { get; set; }
 
+        [ForeignKey(nameof(CityId))]
+        [InverseProperty("Users")]
+        public virtual City City { get; set; }
         [ForeignKey(nameof(GenderId))]
         [InverseProperty("Users")]
         public virtual Gender Gender { get; set; }
-        [ForeignKey(nameof(LocationId))]
-        [InverseProperty("Users")]
-        public virtual Location Location { get; set; }
         [ForeignKey(nameof(UserTypeId))]
         [InverseProperty("Users")]
         public virtual UserType UserType { get; set; }

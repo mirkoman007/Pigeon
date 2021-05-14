@@ -13,7 +13,7 @@ namespace WebAPI.Models
     {
         public City()
         {
-            Locations = new HashSet<Location>();
+            Users = new HashSet<User>();
         }
 
         [Key]
@@ -27,7 +27,7 @@ namespace WebAPI.Models
         [ForeignKey(nameof(CountryId))]
         [InverseProperty("Cities")]
         public virtual Country Country { get; set; }
-        [InverseProperty(nameof(Location.City))]
-        public virtual ICollection<Location> Locations { get; set; }
+        [InverseProperty(nameof(User.City))]
+        public virtual ICollection<User> Users { get; set; }
     }
 }

@@ -14,7 +14,6 @@ namespace WebAPI.Models
         public Country()
         {
             Cities = new HashSet<City>();
-            Locations = new HashSet<Location>();
         }
 
         [Key]
@@ -25,7 +24,5 @@ namespace WebAPI.Models
 
         [InverseProperty(nameof(City.Country))]
         public virtual ICollection<City> Cities { get; set; }
-        [InverseProperty(nameof(Location.Country))]
-        public virtual ICollection<Location> Locations { get; set; }
     }
 }

@@ -29,7 +29,6 @@ namespace WebAPI.Data
         public virtual DbSet<Gender> Genders { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupReport> GroupReports { get; set; }
-        public virtual DbSet<Location> Locations { get; set; }
         public virtual DbSet<Medium> Media { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<MessageReaction> MessageReactions { get; set; }
@@ -49,7 +48,7 @@ namespace WebAPI.Data
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=den1.mssql8.gear.host;Database=pigeondb3;User Id=pigeondb3;Password=Py42ssQ!?3jz;");
+                optionsBuilder.UseSqlServer("Server=den1.mssql7.gear.host;Database=pigeondb2;User Id=pigeondb2;Password=Se4u9?Z7J-z7;");
             }
         }
 
@@ -60,7 +59,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<City>(entity =>
             {
                 entity.HasKey(e => e.Idcity)
-                    .HasName("PK__City__36D3508359847F2F");
+                    .HasName("PK__City__36D35083E15E87EC");
 
                 entity.Property(e => e.Name).IsUnicode(false);
 
@@ -73,51 +72,51 @@ namespace WebAPI.Data
             modelBuilder.Entity<Comment>(entity =>
             {
                 entity.HasKey(e => e.Idcomment)
-                    .HasName("PK__Comment__C71D7B98AB93D2DC");
+                    .HasName("PK__Comment__C71D7B98D1210D22");
 
                 entity.Property(e => e.Text).IsUnicode(false);
 
                 entity.HasOne(d => d.CommentNavigation)
                     .WithMany(p => p.InverseCommentNavigation)
                     .HasForeignKey(d => d.CommentId)
-                    .HasConstraintName("FK__Comment__Comment__02084FDA");
+                    .HasConstraintName("FK__Comment__Comment__7E37BEF6");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__Comment__PostID__01142BA1");
+                    .HasConstraintName("FK__Comment__PostID__7D439ABD");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Comments)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Comment__UserID__02FC7413");
+                    .HasConstraintName("FK__Comment__UserID__7F2BE32F");
             });
 
             modelBuilder.Entity<CommentReaction>(entity =>
             {
                 entity.HasKey(e => e.IdcommentReaction)
-                    .HasName("PK__CommentR__1DB6A5903F081B8B");
+                    .HasName("PK__CommentR__1DB6A59077275D40");
 
                 entity.HasOne(d => d.Comment)
                     .WithMany(p => p.CommentReactions)
                     .HasForeignKey(d => d.CommentId)
-                    .HasConstraintName("FK__CommentRe__Comme__05D8E0BE");
+                    .HasConstraintName("FK__CommentRe__Comme__02084FDA");
 
                 entity.HasOne(d => d.Reaction)
                     .WithMany(p => p.CommentReactions)
                     .HasForeignKey(d => d.ReactionId)
-                    .HasConstraintName("FK__CommentRe__React__06CD04F7");
+                    .HasConstraintName("FK__CommentRe__React__02FC7413");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CommentReactions)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__CommentRe__UserI__07C12930");
+                    .HasConstraintName("FK__CommentRe__UserI__03F0984C");
             });
 
             modelBuilder.Entity<CommentReport>(entity =>
             {
                 entity.HasKey(e => e.IdcommentReport)
-                    .HasName("PK__CommentR__3027E215F3C96DE6");
+                    .HasName("PK__CommentR__3027E215649ADC8F");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -126,18 +125,18 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.Comment)
                     .WithMany(p => p.CommentReports)
                     .HasForeignKey(d => d.CommentId)
-                    .HasConstraintName("FK__CommentRe__Comme__0A9D95DB");
+                    .HasConstraintName("FK__CommentRe__Comme__06CD04F7");
 
                 entity.HasOne(d => d.Sender)
                     .WithMany(p => p.CommentReports)
                     .HasForeignKey(d => d.SenderId)
-                    .HasConstraintName("FK__CommentRe__Sende__0B91BA14");
+                    .HasConstraintName("FK__CommentRe__Sende__07C12930");
             });
 
             modelBuilder.Entity<Country>(entity =>
             {
                 entity.HasKey(e => e.Idcountry)
-                    .HasName("PK__Country__D9D5A69476120169");
+                    .HasName("PK__Country__D9D5A69493D03226");
 
                 entity.Property(e => e.Name).IsUnicode(false);
             });
@@ -145,50 +144,50 @@ namespace WebAPI.Data
             modelBuilder.Entity<DeletedMessage>(entity =>
             {
                 entity.HasKey(e => e.IddeletedMessage)
-                    .HasName("PK__DeletedM__5D8807BA8D28E788");
+                    .HasName("PK__DeletedM__5D8807BA316CE78C");
 
                 entity.HasOne(d => d.Message)
                     .WithMany(p => p.DeletedMessages)
                     .HasForeignKey(d => d.MessageId)
-                    .HasConstraintName("FK__DeletedMe__Messa__6477ECF3");
+                    .HasConstraintName("FK__DeletedMe__Messa__60A75C0F");
             });
 
             modelBuilder.Entity<Friend>(entity =>
             {
                 entity.HasKey(e => e.Idfriend)
-                    .HasName("PK__Friend__FB73C39026ABA11F");
+                    .HasName("PK__Friend__FB73C39008544C80");
 
                 entity.HasOne(d => d.UserRequest)
                     .WithMany(p => p.FriendUserRequests)
                     .HasForeignKey(d => d.UserRequestId)
-                    .HasConstraintName("FK__Friend__UserRequ__4BAC3F29");
+                    .HasConstraintName("FK__Friend__UserRequ__47DBAE45");
 
                 entity.HasOne(d => d.UserResponder)
                     .WithMany(p => p.FriendUserResponders)
                     .HasForeignKey(d => d.UserResponderId)
-                    .HasConstraintName("FK__Friend__UserResp__4CA06362");
+                    .HasConstraintName("FK__Friend__UserResp__48CFD27E");
             });
 
             modelBuilder.Entity<FriendRequest>(entity =>
             {
                 entity.HasKey(e => e.IdfriendRequest)
-                    .HasName("PK__FriendRe__FC78D63CD27E05D7");
+                    .HasName("PK__FriendRe__FC78D63CA4D52E37");
 
                 entity.HasOne(d => d.UserRequest)
                     .WithMany(p => p.FriendRequestUserRequests)
                     .HasForeignKey(d => d.UserRequestId)
-                    .HasConstraintName("FK__FriendReq__UserR__47DBAE45");
+                    .HasConstraintName("FK__FriendReq__UserR__440B1D61");
 
                 entity.HasOne(d => d.UserResponder)
                     .WithMany(p => p.FriendRequestUserResponders)
                     .HasForeignKey(d => d.UserResponderId)
-                    .HasConstraintName("FK__FriendReq__UserR__48CFD27E");
+                    .HasConstraintName("FK__FriendReq__UserR__44FF419A");
             });
 
             modelBuilder.Entity<Gender>(entity =>
             {
                 entity.HasKey(e => e.Idgender)
-                    .HasName("PK__Gender__42370E7975E73C4F");
+                    .HasName("PK__Gender__42370E79F0806741");
 
                 entity.Property(e => e.Name).IsUnicode(false);
             });
@@ -196,7 +195,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<Group>(entity =>
             {
                 entity.HasKey(e => e.Idgroup)
-                    .HasName("PK__Group__CB4260CAE570A18D");
+                    .HasName("PK__Group__CB4260CAC14C1518");
 
                 entity.Property(e => e.Description).IsUnicode(false);
 
@@ -206,7 +205,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<GroupReport>(entity =>
             {
                 entity.HasKey(e => e.IdgroupReport)
-                    .HasName("PK__GroupRep__0A30267B31A3E46D");
+                    .HasName("PK__GroupRep__0A30267BD1EAF091");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -215,84 +214,68 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.GroupReports)
                     .HasForeignKey(d => d.GroupId)
-                    .HasConstraintName("FK__GroupRepo__Group__59063A47");
+                    .HasConstraintName("FK__GroupRepo__Group__5535A963");
 
                 entity.HasOne(d => d.UserSender)
                     .WithMany(p => p.GroupReports)
                     .HasForeignKey(d => d.UserSenderId)
-                    .HasConstraintName("FK__GroupRepo__UserS__59FA5E80");
-            });
-
-            modelBuilder.Entity<Location>(entity =>
-            {
-                entity.HasKey(e => e.Idlocation)
-                    .HasName("PK__Location__C2B752778613DC46");
-
-                entity.HasOne(d => d.City)
-                    .WithMany(p => p.Locations)
-                    .HasForeignKey(d => d.CityId)
-                    .HasConstraintName("FK__Location__CityID__3B75D760");
-
-                entity.HasOne(d => d.Country)
-                    .WithMany(p => p.Locations)
-                    .HasForeignKey(d => d.CountryId)
-                    .HasConstraintName("FK__Location__Countr__3C69FB99");
+                    .HasConstraintName("FK__GroupRepo__UserS__5629CD9C");
             });
 
             modelBuilder.Entity<Medium>(entity =>
             {
                 entity.HasKey(e => e.Idmedia)
-                    .HasName("PK__Media__F2B436C5F0CCC5FB");
+                    .HasName("PK__Media__F2B436C594E7F414");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.Media)
                     .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__Media__PostID__75A278F5");
+                    .HasConstraintName("FK__Media__PostID__71D1E811");
             });
 
             modelBuilder.Entity<Message>(entity =>
             {
                 entity.HasKey(e => e.Idmessage)
-                    .HasName("PK__Message__195595EC27335381");
+                    .HasName("PK__Message__195595ECF527B2F4");
 
                 entity.Property(e => e.Text).IsUnicode(false);
 
                 entity.HasOne(d => d.Receiver)
                     .WithMany(p => p.MessageReceivers)
                     .HasForeignKey(d => d.ReceiverId)
-                    .HasConstraintName("FK__Message__Receive__619B8048");
+                    .HasConstraintName("FK__Message__Receive__5DCAEF64");
 
                 entity.HasOne(d => d.Sender)
                     .WithMany(p => p.MessageSenders)
                     .HasForeignKey(d => d.SenderId)
-                    .HasConstraintName("FK__Message__SenderI__60A75C0F");
+                    .HasConstraintName("FK__Message__SenderI__5CD6CB2B");
             });
 
             modelBuilder.Entity<MessageReaction>(entity =>
             {
                 entity.HasKey(e => e.IdmessageReaction)
-                    .HasName("PK__MessageR__0AD165E72322A4B9");
+                    .HasName("PK__MessageR__0AD165E7A59EEBE8");
 
                 entity.HasOne(d => d.Message)
                     .WithMany(p => p.MessageReactions)
                     .HasForeignKey(d => d.MessageId)
-                    .HasConstraintName("FK__MessageRe__Messa__693CA210");
+                    .HasConstraintName("FK__MessageRe__Messa__656C112C");
 
                 entity.HasOne(d => d.Reaction)
                     .WithMany(p => p.MessageReactions)
                     .HasForeignKey(d => d.ReactionId)
-                    .HasConstraintName("FK__MessageRe__React__6A30C649");
+                    .HasConstraintName("FK__MessageRe__React__66603565");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.MessageReactions)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__MessageRe__UserI__6B24EA82");
+                    .HasConstraintName("FK__MessageRe__UserI__6754599E");
             });
 
             modelBuilder.Entity<MessageReport>(entity =>
             {
                 entity.HasKey(e => e.IdmessageReport)
-                    .HasName("PK__MessageR__3D9BEF923D569F76");
+                    .HasName("PK__MessageR__3D9BEF92AD59F7F4");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -301,57 +284,57 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.Message)
                     .WithMany(p => p.MessageReports)
                     .HasForeignKey(d => d.MessageId)
-                    .HasConstraintName("FK__MessageRe__Messa__6E01572D");
+                    .HasConstraintName("FK__MessageRe__Messa__6A30C649");
 
                 entity.HasOne(d => d.Sender)
                     .WithMany(p => p.MessageReports)
                     .HasForeignKey(d => d.SenderId)
-                    .HasConstraintName("FK__MessageRe__Sende__6EF57B66");
+                    .HasConstraintName("FK__MessageRe__Sende__6B24EA82");
             });
 
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.HasKey(e => e.Idpost)
-                    .HasName("PK__Post__8B0115BD555A44BB");
+                    .HasName("PK__Post__8B0115BD7D7B76AC");
 
                 entity.Property(e => e.Text).IsUnicode(false);
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.GroupId)
-                    .HasConstraintName("FK__Post__GroupID__71D1E811");
+                    .HasConstraintName("FK__Post__GroupID__6E01572D");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Post__UserID__72C60C4A");
+                    .HasConstraintName("FK__Post__UserID__6EF57B66");
             });
 
             modelBuilder.Entity<PostReaction>(entity =>
             {
                 entity.HasKey(e => e.IdpostReaction)
-                    .HasName("PK__PostReac__EA97966AF31C0848");
+                    .HasName("PK__PostReac__EA97966AE22F8B8D");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostReactions)
                     .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__PostReact__PostI__7C4F7684");
+                    .HasConstraintName("FK__PostReact__PostI__787EE5A0");
 
                 entity.HasOne(d => d.Reaction)
                     .WithMany(p => p.PostReactions)
                     .HasForeignKey(d => d.ReactionId)
-                    .HasConstraintName("FK__PostReact__React__7D439ABD");
+                    .HasConstraintName("FK__PostReact__React__797309D9");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.PostReactions)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__PostReact__UserI__7E37BEF6");
+                    .HasConstraintName("FK__PostReact__UserI__7A672E12");
             });
 
             modelBuilder.Entity<PostReport>(entity =>
             {
                 entity.HasKey(e => e.IdpostReport)
-                    .HasName("PK__PostRepo__852C7D3ADD0175EE");
+                    .HasName("PK__PostRepo__852C7D3AB97A09F7");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -360,18 +343,18 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostReports)
                     .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__PostRepor__PostI__787EE5A0");
+                    .HasConstraintName("FK__PostRepor__PostI__74AE54BC");
 
                 entity.HasOne(d => d.Sender)
                     .WithMany(p => p.PostReports)
                     .HasForeignKey(d => d.SenderId)
-                    .HasConstraintName("FK__PostRepor__Sende__797309D9");
+                    .HasConstraintName("FK__PostRepor__Sende__75A278F5");
             });
 
             modelBuilder.Entity<Reaction>(entity =>
             {
                 entity.HasKey(e => e.Idreaction)
-                    .HasName("PK__Reaction__D866342A8CEFF008");
+                    .HasName("PK__Reaction__D866342A451C50B4");
 
                 entity.Property(e => e.Value).IsUnicode(false);
             });
@@ -379,7 +362,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Iduser)
-                    .HasName("PK__User__EAE6D9DFE6EB9EF6");
+                    .HasName("PK__User__EAE6D9DFBEC94876");
 
                 entity.Property(e => e.Email).IsUnicode(false);
 
@@ -389,42 +372,42 @@ namespace WebAPI.Data
 
                 entity.Property(e => e.PasswordHash).IsFixedLength(true);
 
+                entity.HasOne(d => d.City)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.CityId)
+                    .HasConstraintName("FK__User__CityID__412EB0B6");
+
                 entity.HasOne(d => d.Gender)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.GenderId)
-                    .HasConstraintName("FK__User__GenderID__440B1D61");
-
-                entity.HasOne(d => d.Location)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.LocationId)
-                    .HasConstraintName("FK__User__LocationID__44FF419A");
+                    .HasConstraintName("FK__User__GenderID__403A8C7D");
 
                 entity.HasOne(d => d.UserType)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.UserTypeId)
-                    .HasConstraintName("FK__User__UserTypeID__4316F928");
+                    .HasConstraintName("FK__User__UserTypeID__3F466844");
             });
 
             modelBuilder.Entity<UserGroup>(entity =>
             {
                 entity.HasKey(e => e.IduserGroup)
-                    .HasName("PK__UserGrou__2DE7BEFF58D1715A");
+                    .HasName("PK__UserGrou__2DE7BEFFC49EEE11");
 
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.UserGroups)
                     .HasForeignKey(d => d.GroupId)
-                    .HasConstraintName("FK__UserGroup__Group__5629CD9C");
+                    .HasConstraintName("FK__UserGroup__Group__52593CB8");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserGroups)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__UserGroup__UserI__5535A963");
+                    .HasConstraintName("FK__UserGroup__UserI__5165187F");
             });
 
             modelBuilder.Entity<UserReport>(entity =>
             {
                 entity.HasKey(e => e.IduserReport)
-                    .HasName("PK__UserRepo__0867783A4DBB52C1");
+                    .HasName("PK__UserRepo__0867783A453A2325");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -433,18 +416,18 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserReportUsers)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__UserRepor__UserI__4F7CD00D");
+                    .HasConstraintName("FK__UserRepor__UserI__4BAC3F29");
 
                 entity.HasOne(d => d.UserSender)
                     .WithMany(p => p.UserReportUserSenders)
                     .HasForeignKey(d => d.UserSenderId)
-                    .HasConstraintName("FK__UserRepor__UserS__5070F446");
+                    .HasConstraintName("FK__UserRepor__UserS__4CA06362");
             });
 
             modelBuilder.Entity<UserType>(entity =>
             {
                 entity.HasKey(e => e.IduserType)
-                    .HasName("PK__UserType__EA4074F226A56A11");
+                    .HasName("PK__UserType__EA4074F226214504");
 
                 entity.Property(e => e.Value).IsUnicode(false);
             });
@@ -452,7 +435,7 @@ namespace WebAPI.Data
             modelBuilder.Entity<Warning>(entity =>
             {
                 entity.HasKey(e => e.Idwarning)
-                    .HasName("PK__Warning__EECE03516AE1FE2E");
+                    .HasName("PK__Warning__EECE0351BC223C35");
 
                 entity.Property(e => e.Explanation).IsUnicode(false);
 
@@ -461,12 +444,12 @@ namespace WebAPI.Data
                 entity.HasOne(d => d.Admin)
                     .WithMany(p => p.WarningAdmins)
                     .HasForeignKey(d => d.AdminId)
-                    .HasConstraintName("FK__Warning__AdminID__5DCAEF64");
+                    .HasConstraintName("FK__Warning__AdminID__59FA5E80");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.WarningUsers)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Warning__UserID__5CD6CB2B");
+                    .HasConstraintName("FK__Warning__UserID__59063A47");
             });
 
             OnModelCreatingPartial(modelBuilder);
