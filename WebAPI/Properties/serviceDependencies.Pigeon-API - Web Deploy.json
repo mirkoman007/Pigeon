@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/pigeon-db/databases/PigeonDB",
+      "type": "mssql.azure",
+      "connectionId": "PigeonDB_ConnectionString",
+      "secretStore": "AzureAppSettings"
+    }
+  }
+}
