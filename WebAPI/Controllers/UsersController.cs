@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.Models;
+using WebAPI.Models.DTO;
 
 namespace WebAPI.Controllers
 {
@@ -17,22 +19,25 @@ namespace WebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly PigeonContext _context;
+        private readonly IMapper _mapper;
 
-        public UsersController(PigeonContext context)
+        public UsersController(PigeonContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            IEnumerable<User> users = await _context.Users.ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
             string emailAdress = HttpContext.User.Identity.Name;
 
@@ -44,7 +49,8 @@ namespace WebAPI.Controllers
             }
             else
             {
-                return user;
+                
+                return Ok(_mapper.Map<UserDto>(user));
             }
         }
 
