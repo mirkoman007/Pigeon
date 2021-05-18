@@ -5,17 +5,12 @@ namespace WebAPI.Repository
 {
     public interface IUserRepository
     {
+        User Authenticate(string username, string password);
         IEnumerable<User> GetAll();
-
-        User GetUserById(int userId);
-
-        string GetUserPasswordHash(string eMail);
-
-        void Insert(User user);
-
-        void Update(User user);
-
-        void Delete(int userId);
+        User GetById(int id);
+        User Create(User user, string password);
+        void Update(User user, string password = null);
+        void Delete(int id);
 
     }
 }

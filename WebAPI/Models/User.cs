@@ -50,13 +50,13 @@ namespace WebAPI.Models
         public DateTime? Birthday { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime? CreateDateTime { get; set; }
-        public bool? Verification { get; set; }
+        public bool Verification { get; set; }
         [Column("UserTypeID")]
-        public int? UserTypeId { get; set; }
+        public int UserTypeId { get; set; }
         [Column("GenderID")]
-        public int? GenderId { get; set; }
+        public int GenderId { get; set; }
         [Column("CityID")]
-        public int? CityId { get; set; }
+        public int CityId { get; set; }
 
         [ForeignKey(nameof(CityId))]
         [InverseProperty("Users")]

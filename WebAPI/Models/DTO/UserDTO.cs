@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace WebAPI.Models.DTO
 {
@@ -22,6 +21,8 @@ namespace WebAPI.Models.DTO
         public int CityID { get; set; }
 
         public int UserTypeID { get; set; }
+
+        public string Token { get; set; }
 
     }
 

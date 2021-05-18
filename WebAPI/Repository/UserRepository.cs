@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using WebAPI.Controllers;
 using WebAPI.Data;
 using WebAPI.Models;
 
@@ -9,62 +9,124 @@ namespace WebAPI.Repository
 {
     public class UserRepository : IUserRepository
     {
-        private PigeonContext context;
+        private PigeonContext _context;
 
-        public UserRepository(PigeonContext _context)
+        public UserRepository(PigeonContext context)
         {
-            this.context = _context;
+            _context = context;
         }
 
-        public string GetUserPasswordHash(string eMail)
+        public User Authenticate(string email, string password)
         {
-            var userId = GetUserIDFromEmail(eMail);
-            if (userId != 0)
-            {
-                return Encoding.UTF8.GetString(context.Users.Find(userId).PasswordHash);
-            }
-            else
-            {
-                return "";
-            }
-        }
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                return null;
 
-        public int GetUserIDFromEmail(string eMail)
-        {
-            foreach (var user in context.Users)
-            {
-                if (user.Email.Equals(eMail))
-                {
-                    return user.Iduser;
-                }
-            }
-            return 0;
+            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+
+            // check if username exists
+            if (user == null)
+                return null;
+
+            // check if password is correct
+            if (!VerifyPasswordHash(password, user.PasswordHash))
+                return null;
+
+            // authentication successful
+            return user;
         }
 
         public IEnumerable<User> GetAll()
         {
-            return context.Users.ToList();
+            return _context.Users;
         }
 
-        public User GetUserById(int userId)
+        public User GetById(int id)
         {
-            return context.Users.Find(userId);
+            return _context.Users.Find(id);
         }
 
-        public void Insert(User user)
+        public User Create(User user, string password)
         {
-            context.Users.Add(user);
+            // validation
+            if (string.IsNullOrWhiteSpace(password))
+                throw new ApplicationException("Password is required");
+
+            if (_context.Users.Any(x => x.Email == user.Email))
+                throw new ApplicationException("Email \"" + user.Email + "\" is already taken");
+
+            byte[] passwordHash = System.Text.Encoding.UTF8.GetBytes(SecurePasswordHasher.Hash(password));
+
+            user.PasswordHash = passwordHash;
+
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            return user;
         }
 
-        public void Update(User user)
+        public void Update(User userParam, string password = null)
         {
-            context.Entry(user).State = EntityState.Modified;
+            var user = _context.Users.Find(userParam.Iduser);
+
+            if (user == null)
+                throw new ApplicationException("User not found");
+
+            // update username if it has changed
+            if (!string.IsNullOrWhiteSpace(userParam.Email) && userParam.Email != user.Email)
+            {
+                // throw error if the new username is already taken
+                if (_context.Users.Any(x => x.Email == userParam.Email))
+                    throw new ApplicationException("Email " + userParam.Email + " is already taken");
+
+                user.Email = userParam.Email;
+            }
+
+            // update user properties if provided
+            if (!string.IsNullOrWhiteSpace(userParam.FirstName))
+                user.FirstName = userParam.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(userParam.LastName))
+                user.LastName = userParam.LastName;
+
+            // update password if provided
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                byte[] passwordHash = System.Text.Encoding.UTF8.GetBytes(SecurePasswordHasher.Hash(password));
+
+                user.PasswordHash = passwordHash;
+            }
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
         }
 
-        public void Delete(int userId)
+        public void Delete(int id)
         {
-            User user = context.Users.Find(userId);
-            context.Users.Remove(user);
+            var user = _context.Users.Find(id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+            }
+        }
+
+        // private helper methods
+
+
+        private static bool VerifyPasswordHash(string password, byte[] storedHash)
+        {
+            if (password == null) throw new ArgumentNullException("password");
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+
+            var hash = System.Text.Encoding.Default.GetString(storedHash);
+            if (SecurePasswordHasher.Verify(password, hash))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
