@@ -68,8 +68,11 @@ namespace WebAPI.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Birthday = user.Birthday,
+                CreateDateTime = user.CreateDateTime,
                 GenderID = user.GenderId,
                 CityID = user.CityId,
+                UserTypeID = user.UserTypeId,
                 Token = tokenString
             });
         }

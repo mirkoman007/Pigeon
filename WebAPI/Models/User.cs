@@ -47,9 +47,9 @@ namespace WebAPI.Models
         [MaxLength(64)]
         public byte[] PasswordHash { get; set; }
         [Column(TypeName = "date")]
-        public DateTime? Birthday { get; set; }
+        public DateTime Birthday { get; set; }
         [Column(TypeName = "datetime")]
-        public DateTime? CreateDateTime { get; set; }
+        public DateTime CreateDateTime { get; set; }
         public bool Verification { get; set; }
         [Column("UserTypeID")]
         public int UserTypeId { get; set; }
