@@ -1,17 +1,16 @@
-﻿using System;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using WebAPI.Data;
 using WebAPI.Models;
 using WebAPI.Models.Command;
@@ -26,6 +25,7 @@ namespace WebAPI.Controllers
     public class UsersController : ControllerBase
     {
         private IUserRepository _userRepository;
+        private ICityRepository _cityRepository;
         private readonly PigeonContext _context;
         private readonly IMapper _mapper;
         private readonly AppSettings _appSettings;
@@ -36,6 +36,7 @@ namespace WebAPI.Controllers
             _mapper = mapper;
             _appSettings = appsettings.Value;
             _userRepository = new UserRepository(_context);
+            _cityRepository = new CityRepository(_context);
         }
 
         [AllowAnonymous]
@@ -70,9 +71,9 @@ namespace WebAPI.Controllers
                 LastName = user.LastName,
                 Birthday = user.Birthday,
                 CreateDateTime = user.CreateDateTime,
-                GenderID = user.GenderId,
-                CityID = user.CityId,
-                UserTypeID = user.UserTypeId,
+                Gender = _context.Genders.Find(user.GenderId).Name,
+                City = _context.Cities.Find(user.CityId).Name,
+                UserType = _context.UserTypes.Find(user.UserTypeId).Value,
                 Token = tokenString
             });
         }
@@ -82,7 +83,8 @@ namespace WebAPI.Controllers
         public IActionResult Register([FromBody] RegisterUserCommand model)
         {
             // map model to entity
-            var user = _mapper.Map<User>(model);
+            var user = CreateUserWithGenderAndCity(model);
+            user.Verification = false;
 
             try
             {
@@ -101,7 +103,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            IEnumerable<User> users = await _context.Users.ToListAsync();
+            IEnumerable<User> users = await _context.Users.Include(x=>x.Gender).Include(x=>x.UserType).Include(x=>x.City).ToListAsync();
             return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
         }
 
@@ -109,23 +111,24 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
-            var user = _userRepository.GetById(id);
+            List<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
+            var user = users.Find(x=>x.Iduser == id);
             user.PasswordHash = null;
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(_mapper.Map<UserDto>(user));
+                return await Task.FromResult(Ok(_mapper.Map<UserDto>(user)));
             }
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] UpdateUserCommand model)
+        public IActionResult Update(int id, [FromBody] RegisterUserCommand model)
         {
             // map model to entity and set id
-            var user = _mapper.Map<User>(model);
+            var user = CreateUserWithGenderAndCity(model);
             user.Iduser = id;
 
             try
@@ -156,5 +159,61 @@ namespace WebAPI.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("verify/{id}")]
+        public async Task<ActionResult<UserDto>> VerifyUser([FromRoute]int id)
+        {
+            List<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
+            var user = users.Find(x => x.Iduser == id);
+            user.Verification = true;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+            user.PasswordHash = null;
+            if (user == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return await Task.FromResult(Ok(_mapper.Map<UserDto>(user)));
+            }
+        }
+
+        private User CreateUserWithGenderAndCity(RegisterUserCommand model)
+        {
+            var user = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                Birthday = model.Birthday,
+                CreateDateTime = DateTime.Now,
+                UserTypeId = 2,
+                Verification = false
+            };
+            if (!_context.Cities.Any(a => a.Name == model.City))
+            {
+                City city = new City { Name = model.City, CountryId = 1 };
+                _context.Cities.Add(city);
+                _context.SaveChanges();
+                user.CityId = _context.Cities.SingleOrDefaultAsync(c => c.Name == city.Name).Result.Idcity;
+            }
+            else
+            {
+                user.CityId = _context.Cities.SingleOrDefaultAsync(c => c.Name == model.City).Result.Idcity;
+            }
+
+            if (model.Gender.ToLower().Equals("male"))
+            {
+                user.GenderId = 1;
+            }
+            else
+            {
+                user.GenderId = 2;
+            }
+            user.UserTypeId = 2;
+            return user;
+        }
+
     }
 }

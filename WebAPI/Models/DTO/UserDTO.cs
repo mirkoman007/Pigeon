@@ -16,11 +16,13 @@ namespace WebAPI.Models.DTO
 
         public DateTime CreateDateTime { get; set; }
 
-        public int GenderID { get; set; }
+        public bool Verification { get; set; }
 
-        public int CityID { get; set; }
+        public string Gender { get; set; }
 
-        public int UserTypeID { get; set; }
+        public string City { get; set; }
+
+        public string UserType { get; set; }
 
         public string Token { get; set; }
 

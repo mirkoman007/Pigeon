@@ -13,7 +13,10 @@ namespace WebAPI.Profiles
     {
         public UserProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(x => x.Gender,opt => opt.MapFrom(y => y.Gender.Name))
+                .ForMember(x => x.UserType,opt => opt.MapFrom(y => y.UserType.Value))
+                .ForMember(x => x.City,opt => opt.MapFrom(y => y.City.Name));
             CreateMap<RegisterUserCommand, User>();
             CreateMap<UpdateUserCommand, User>();
             

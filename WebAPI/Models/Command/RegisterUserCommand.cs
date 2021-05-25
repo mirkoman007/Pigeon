@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebAPI.Models.Command
 {
@@ -24,18 +21,10 @@ namespace WebAPI.Models.Command
         public DateTime Birthday { get; set; }
 
         [Required]
-        public DateTime CreateDateTime { get; set; }
+        public string Gender { get; set; }
 
         [Required]
-        public bool Verification { get; set; }
+        public string City { get; set; }
 
-        [Required]
-        public int UserTypeId { get; set; }
-
-        [Required]
-        public int GenderId { get; set; }
-
-        [Required]
-        public int CityId { get; set; }
     }
 }
