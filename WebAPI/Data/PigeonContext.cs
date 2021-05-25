@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
 
 #nullable disable
@@ -335,12 +333,13 @@ namespace WebAPI.Data
 
                 entity.Property(e => e.Idmedia).HasColumnName("IDMedia");
 
-                entity.Property(e => e.PostId).HasColumnName("PostID");
+                entity.Property(e => e.MediaPath)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
 
-                entity.HasOne(d => d.Post)
-                    .WithMany(p => p.Media)
-                    .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__Media__PostID__3F6663D5");
+                entity.Property(e => e.Title)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Message>(entity =>
@@ -453,6 +452,8 @@ namespace WebAPI.Data
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
+                entity.Property(e => e.MediaId).HasColumnName("MediaID");
+
                 entity.Property(e => e.Text)
                     .HasMaxLength(255)
                     .IsUnicode(false);
@@ -463,6 +464,11 @@ namespace WebAPI.Data
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.GroupId)
                     .HasConstraintName("FK__Post__GroupID__3B95D2F1");
+
+                entity.HasOne(d => d.Media)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.MediaId)
+                    .HasConstraintName("FK__Post__MediaID__61BB7BD9");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
@@ -706,6 +712,7 @@ namespace WebAPI.Data
 
             OnModelCreatingPartial(modelBuilder);
         }
+
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }

@@ -7,9 +7,15 @@ namespace WebAPI.Models
 {
     public partial class Medium
     {
-        public int Idmedia { get; set; }
-        public int? PostId { get; set; }
+        public Medium()
+        {
+            Posts = new HashSet<Post>();
+        }
 
-        public virtual Post Post { get; set; }
+        public int Idmedia { get; set; }
+        public string Title { get; set; }
+        public string MediaPath { get; set; }
+
+        public virtual ICollection<Post> Posts { get; set; }
     }
 }
