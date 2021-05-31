@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject IAuthenticationService AuthenticationService
+
 
 <div class="page">
     <div class="sidebar">
@@ -6,9 +8,12 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>
+        @if (AuthenticationService.User != null)
+        {
+            <div class="top-row px-4">
+                <NavLink href="logout" class="ml-md-auto">Logout</NavLink>
+            </div>
+        }
 
         <div class="content px-4">
             @Body
