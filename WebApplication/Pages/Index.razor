@@ -1,34 +1,20 @@
 ﻿@page "/"
 @attribute [Authorize]
-@inject IUserService UserService
+@inject IAuthenticationService AuthenticationService
 
-<div class="card mt-4">
-    <h4 class="card-header">User list</h4>
-    <div class="card-body">
-        @if (loading)
-        {
-            <div class="spinner-border spinner-border-sm"></div>
-        }
-        @if (users != null)
-        {
-            <ul>
-                @foreach (var user in users)
-                {
-                    <li>@user.FirstName @user.LastName</li>
-                }
-            </ul>
-        }
-    </div>
-</div>
+<h3>Index</h3>
+<p>@AuthenticationService.User.IdUser</p>
+<p>@AuthenticationService.User.Email</p>
+<p>@AuthenticationService.User.FirstName</p>
+<p>@AuthenticationService.User.LastName</p>
+<p>@AuthenticationService.User.Gender</p>
+<p>@AuthenticationService.User.City</p>
+<p>@AuthenticationService.User.Birthday</p>
+<p>@AuthenticationService.User.CreateDateTime</p>
+<p>@AuthenticationService.User.Verification</p>
+<p>@AuthenticationService.User.UserType</p>
+<p>@AuthenticationService.User.Token</p>
 
 @code {
-    private bool loading;
-    private IEnumerable<User> users;
 
-    protected override async Task OnInitializedAsync()
-    {
-        loading = true;
-        users = await UserService.GetAll();
-        loading = false;
-    }
 }

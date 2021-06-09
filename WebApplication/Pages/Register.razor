@@ -1,0 +1,98 @@
+﻿@page "/register"
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<div class="col-md-6 offset-md-3 mt-5">
+    <div class="card">
+        <h4 class="card-header">Register</h4>
+        <div class="card-body">
+            <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                <DataAnnotationsValidator />
+                <div class="form-group">
+                    <label>First Name</label>
+                    <InputText @bind-Value="model.FirstName" class="form-control" />
+                    <ValidationMessage For="@(() => model.FirstName)" />
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <InputText @bind-Value="model.LastName" class="form-control" />
+                    <ValidationMessage For="@(() => model.LastName)" />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <InputText @bind-Value="model.Email" class="form-control" />
+                    <ValidationMessage For="@(() => model.Email)" />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <InputText @bind-Value="model.Password" type="password" class="form-control" />
+                    <ValidationMessage For="@(() => model.Password)" />
+                </div>
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <InputDate @bind-Value="model.Birthday" type="date" min="1850-01-01" class="form-control" />
+                    <ValidationMessage For="@(() => model.Birthday)" />
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <InputSelect @bind-Value="model.Gender" class="form-control">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </InputSelect>
+                    <ValidationMessage For="@(() => model.Gender)" />
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <InputText @bind-Value="model.City" class="form-control" />
+                    <ValidationMessage For="@(() => model.City)" />
+                </div>
+                <button disabled="@loading" class="btn btn-primary">
+                    @if (loading)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+
+                    }
+                    Register
+                </button>
+                <NavLink href="login" class="btn btn-link">Cancel</NavLink>
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger mt-3 mb-0">@error</div>
+                }
+            </EditForm>
+        </div>
+    </div>
+
+</div>
+@code {
+    private RegUser model = new RegUser();
+    private bool loading;
+    private string error;
+
+    protected override void OnInitialized()
+    {
+        // redirect to home if already logged in
+        if (AuthenticationService.User != null)
+        {
+            NavigationManager.NavigateTo("");
+        }
+    }
+
+    private async void OnValidSubmit()
+    {
+        loading = true;
+        try
+        {
+            await AuthenticationService.Register(model);
+            NavigationManager.NavigateTo("login");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+
+}

@@ -1,22 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApplication.Models
+namespace WebApplication.Models.Account
 {
-    public class User
+    public class RegUser
     {
-        public int IdUser { get; set; }
+        [Required]
         public string FirstName { get; set; }
+
+        [Required]
         public string LastName { get; set; }
+        
+        [Required]
         public string Email { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+
+        [Required]
         public DateTime Birthday { get; set; }
-        public DateTime CreateDateTime { get; set; }
-        public bool Verification { get; set; }
+
+        [Required]
         public string Gender { get; set; }
+
+        [Required]
         public string City { get; set; }
-        public string UserType { get; set; }
-        public string Token { get; set; }
     }
 }

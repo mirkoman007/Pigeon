@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication.Models;
+using WebApplication.Models.Account;
 
 namespace WebApplication.Services
 {
@@ -13,6 +14,7 @@ namespace WebApplication.Services
         Task Initialize();
         Task Login(string email, string password);
         Task Logout();
+        Task Register(RegUser model);
     }
 
     public class AuthenticationService : IAuthenticationService
@@ -46,6 +48,11 @@ namespace WebApplication.Services
             User = null;
             await _localStorageService.RemoveItem("user");
             _navigationManager.NavigateTo("login");
+        }
+
+        public async Task Register(RegUser model)
+        {
+            await _httpService.Post("/api/users/register", model);
         }
     }
 }
