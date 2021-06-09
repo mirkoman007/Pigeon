@@ -8,6 +8,15 @@ namespace WebApplication.Models.Account
 {
     public class RegUser
     {
+        public RegUser()
+        {
+        }
+
+        public RegUser(DateTime birthday)
+        {
+            Birthday = birthday;
+        }
+
         [Required]
         public string FirstName { get; set; }
 

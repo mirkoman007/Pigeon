@@ -65,12 +65,16 @@
 
 </div>
 @code {
-    private RegUser model = new RegUser();
+
+    DateTime date;
+    private RegUser model;
     private bool loading;
     private string error;
 
     protected override void OnInitialized()
     {
+        date = new DateTime(1990, 1, 1);
+        model = new RegUser(date);
         // redirect to home if already logged in
         if (AuthenticationService.User != null)
         {
