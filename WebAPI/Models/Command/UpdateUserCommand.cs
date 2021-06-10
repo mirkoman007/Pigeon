@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WebAPI.Models.Command
 {
@@ -13,14 +10,10 @@ namespace WebAPI.Models.Command
 
         public string Email { get; set; }
 
-        public string Password { get; set; }
-
         public DateTime Birthday { get; set; }
 
-        public bool Verification { get; set; }
+        public string Gender { get; set; }
 
-        public int GenderId { get; set; }
-
-        public int CityId { get; set; }
+        public string City { get; set; }
     }
 }

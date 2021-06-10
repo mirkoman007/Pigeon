@@ -83,7 +83,7 @@ namespace WebAPI.Controllers
         public IActionResult Register([FromBody] RegisterUserCommand model)
         {
             // map model to entity
-            var user = CreateUserWithGenderAndCity(model);
+            var user = CreateUserWithGenderAndCityRegister(model);
             user.Verification = false;
 
             try
@@ -103,7 +103,7 @@ namespace WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            IEnumerable<User> users = await _context.Users.Include(x=>x.Gender).Include(x=>x.UserType).Include(x=>x.City).ToListAsync();
+            IEnumerable<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
             return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
         }
 
@@ -112,7 +112,7 @@ namespace WebAPI.Controllers
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
             List<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
-            var user = users.Find(x=>x.Iduser == id);
+            var user = users.Find(x => x.Iduser == id);
             user.PasswordHash = null;
             if (user == null)
             {
@@ -125,17 +125,44 @@ namespace WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] RegisterUserCommand model)
+        public IActionResult Update(int id, [FromBody] UpdateUserCommand model)
         {
             // map model to entity and set id
-            var user = CreateUserWithGenderAndCity(model);
+            var user = CreateUserWithGenderAndCityUpdate(model);
             user.Iduser = id;
 
             try
             {
                 // update user 
-                _userRepository.Update(user, model.Password);
+                _userRepository.Update(user);
                 return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}/password")]
+        public IActionResult UpdatePassword(int id, [FromBody] UpdateUserPasswordCommand model)
+        {
+            // map model to entity and set id
+            var user = new User();
+            user.Iduser = id;
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(model.Password) && !string.IsNullOrEmpty(model.OldPassword))
+                {
+                    // update user 
+                    _userRepository.Update(user, model.Password, model.OldPassword);
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("There was a problem with passwords(Check if null or property name correctly spelled)");
+                }
             }
             catch (ApplicationException ex)
             {
@@ -161,7 +188,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("verify/{id}")]
-        public async Task<ActionResult<UserDto>> VerifyUser([FromRoute]int id)
+        public async Task<ActionResult<UserDto>> VerifyUser([FromRoute] int id)
         {
             List<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
             var user = users.Find(x => x.Iduser == id);
@@ -179,7 +206,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        private User CreateUserWithGenderAndCity(RegisterUserCommand model)
+        private User CreateUserWithGenderAndCityRegister(RegisterUserCommand model)
         {
             var user = new User
             {
@@ -210,6 +237,45 @@ namespace WebAPI.Controllers
             else
             {
                 user.GenderId = 2;
+            }
+            user.UserTypeId = 2;
+            return user;
+        }
+        private User CreateUserWithGenderAndCityUpdate(UpdateUserCommand model)
+        {
+            var user = new User
+            {
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email,
+                Birthday = model.Birthday,
+                UserTypeId = 2
+            };
+            if (!string.IsNullOrEmpty(model.City))
+            {
+                if (!_context.Cities.Any(a => a.Name == model.City))
+                {
+                    City city = new City { Name = model.City, CountryId = 1 };
+                    _context.Cities.Add(city);
+                    _context.SaveChanges();
+                    user.CityId = _context.Cities.SingleOrDefaultAsync(c => c.Name == city.Name).Result.Idcity;
+                }
+                else
+                {
+                    user.CityId = _context.Cities.SingleOrDefaultAsync(c => c.Name == model.City).Result.Idcity;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(model.Gender))
+            {
+                if (model.Gender.ToLower().Equals("male"))
+                {
+                    user.GenderId = 1;
+                }
+                else
+                {
+                    user.GenderId = 2;
+                }
             }
             user.UserTypeId = 2;
             return user;

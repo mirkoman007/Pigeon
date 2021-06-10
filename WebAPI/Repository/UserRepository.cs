@@ -64,17 +64,17 @@ namespace WebAPI.Repository
             return user;
         }
 
-        public void Update(User userParam, string password = null)
+        public void Update(User userParam, string password = null, string passwordOld = null)
         {
             var user = _context.Users.Find(userParam.Iduser);
 
             if (user == null)
                 throw new ApplicationException("User not found");
 
-            // update username if it has changed
+            // update mail if it has changed
             if (!string.IsNullOrWhiteSpace(userParam.Email) && userParam.Email != user.Email)
             {
-                // throw error if the new username is already taken
+                // throw error if the new mail is already taken
                 if (_context.Users.Any(x => x.Email == userParam.Email))
                     throw new ApplicationException("Email " + userParam.Email + " is already taken");
 
@@ -88,12 +88,24 @@ namespace WebAPI.Repository
             if (!string.IsNullOrWhiteSpace(userParam.LastName))
                 user.LastName = userParam.LastName;
 
-            // update password if provided
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                byte[] passwordHash = System.Text.Encoding.UTF8.GetBytes(SecurePasswordHasher.Hash(password));
+            if (userParam.GetType().GetProperty("CityId") != null)
+                user.CityId = userParam.CityId;
 
-                user.PasswordHash = passwordHash;
+            if (userParam.GenderId == 1 || userParam.GenderId == 2)
+                user.GenderId = userParam.GenderId;
+
+            // update password if provided
+            if (!string.IsNullOrWhiteSpace(password) && !string.IsNullOrEmpty(passwordOld))
+            {
+                if (SecurePasswordHasher.Verify(password, System.Text.Encoding.UTF8.GetString(user.PasswordHash)))
+                {
+                    byte[] passwordHash = System.Text.Encoding.UTF8.GetBytes(SecurePasswordHasher.Hash(password));
+                    user.PasswordHash = passwordHash;
+                }
+                else
+                {
+                    throw new ApplicationException("Incorrect old password");
+                }
             }
 
             _context.Users.Update(user);
@@ -119,14 +131,7 @@ namespace WebAPI.Repository
             if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
 
             var hash = System.Text.Encoding.Default.GetString(storedHash);
-            if (SecurePasswordHasher.Verify(password, hash))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return SecurePasswordHasher.Verify(password, hash);
         }
     }
 }
