@@ -1,0 +1,34 @@
+﻿@page "/users"
+@attribute [Authorize]
+@inject IUserService UserService
+
+<div class="card mt-4">
+    <h4 class="card-header">User list</h4>
+    <div class="card-body">
+        @if (loading)
+        {
+            <div class="spinner-border spinner-border-sm"></div>
+        }
+        @if (users != null)
+        {
+            <ul>
+                @foreach (var user in users)
+                {
+                    <li>@user.IdUser @user.FirstName @user.LastName @user.Email @user.Gender @user.City @user.Birthday @user.CreateDateTime </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@code {
+    private bool loading;
+    private IEnumerable<User> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        users = await UserService.GetAll();
+        loading = false;
+    }
+}
