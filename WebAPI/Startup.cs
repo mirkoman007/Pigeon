@@ -14,6 +14,7 @@ using WebAPI.Data;
 using WebAPI.Repository;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using System.IO;
 
 namespace WebAPI
 {
@@ -77,6 +78,7 @@ namespace WebAPI
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPI", Version = "v1" });
+                c.IncludeXmlComments(Path.Combine(System.AppContext.BaseDirectory, "MyApi.xml"));
             });
         }
 

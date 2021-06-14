@@ -1,35 +1,63 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using WebAPI.Data;
-using WebAPI.Models;
-using WebAPI.Models.Command;
-using WebAPI.Models.DTO;
-using WebAPI.Repository;
-
-namespace WebAPI.Controllers
+﻿namespace WebAPI.Controllers
 {
+    using AutoMapper;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Options;
+    using Microsoft.IdentityModel.Tokens;
+    using System;
+    using System.Collections.Generic;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Linq;
+    using System.Security.Claims;
+    using System.Text;
+    using System.Threading.Tasks;
+    using WebAPI.Data;
+    using WebAPI.Models;
+    using WebAPI.Models.Command;
+    using WebAPI.Models.DTO;
+    using WebAPI.Repository;
+
+    /// <summary>
+    /// Defines the <see cref="UsersController" />.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
     {
+        /// <summary>
+        /// Defines the _userRepository.
+        /// </summary>
         private IUserRepository _userRepository;
+
+        /// <summary>
+        /// Defines the _cityRepository.
+        /// </summary>
         private ICityRepository _cityRepository;
+
+        /// <summary>
+        /// Defines the _context.
+        /// </summary>
         private readonly PigeonContext _context;
+
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
+
+        /// <summary>
+        /// Defines the _appSettings.
+        /// </summary>
         private readonly AppSettings _appSettings;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsersController"/> class.
+        /// </summary>
+        /// <param name="context">The context<see cref="PigeonContext"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
+        /// <param name="appsettings">The appsettings<see cref="IOptions{AppSettings}"/>.</param>
         public UsersController(PigeonContext context, IMapper mapper, IOptions<AppSettings> appsettings)
         {
             _context = context;
@@ -39,6 +67,11 @@ namespace WebAPI.Controllers
             _cityRepository = new CityRepository(_context);
         }
 
+        /// <summary>
+        /// Authenticate user by sending email and password in request body. If authorized this will return bearer header token property for further authorization
+        /// </summary>
+        /// <param name="model">The model<see cref="AuthenticateUserCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody] AuthenticateUserCommand model)
@@ -78,6 +111,11 @@ namespace WebAPI.Controllers
             });
         }
 
+        /// <summary>
+        /// Register user
+        /// </summary>
+        /// <param name="model">The model<see cref="RegisterUserCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterUserCommand model)
@@ -100,6 +138,10 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/Users
+        /// <summary>
+        /// Gets all users
+        /// </summary>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{User}}}"/>.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
@@ -108,6 +150,11 @@ namespace WebAPI.Controllers
         }
 
         // GET: api/Users/5
+        /// <summary>
+        /// Gets one user
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{UserDto}}"/>.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
@@ -124,6 +171,12 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Update user
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <param name="model">The model<see cref="UpdateUserCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] UpdateUserCommand model)
         {
@@ -144,6 +197,12 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Update password
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <param name="model">The model<see cref="UpdateUserPasswordCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [HttpPut("{id}/password")]
         public IActionResult UpdatePassword(int id, [FromBody] UpdateUserPasswordCommand model)
         {
@@ -172,6 +231,11 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/Users/5
+        /// <summary>
+        /// Delete user
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -187,6 +251,11 @@ namespace WebAPI.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Verify user(probably used to send email link)
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{UserDto}}"/>.</returns>
         [HttpGet("verify/{id}")]
         public async Task<ActionResult<UserDto>> VerifyUser([FromRoute] int id)
         {
@@ -206,6 +275,11 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// The CreateUserWithGenderAndCityRegister.
+        /// </summary>
+        /// <param name="model">The model<see cref="RegisterUserCommand"/>.</param>
+        /// <returns>The <see cref="User"/>.</returns>
         private User CreateUserWithGenderAndCityRegister(RegisterUserCommand model)
         {
             var user = new User
@@ -241,6 +315,12 @@ namespace WebAPI.Controllers
             user.UserTypeId = 2;
             return user;
         }
+
+        /// <summary>
+        /// The CreateUserWithGenderAndCityUpdate.
+        /// </summary>
+        /// <param name="model">The model<see cref="UpdateUserCommand"/>.</param>
+        /// <returns>The <see cref="User"/>.</returns>
         private User CreateUserWithGenderAndCityUpdate(UpdateUserCommand model)
         {
             var user = new User
@@ -280,6 +360,5 @@ namespace WebAPI.Controllers
             user.UserTypeId = 2;
             return user;
         }
-
     }
 }

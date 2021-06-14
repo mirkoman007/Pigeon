@@ -13,6 +13,8 @@ namespace WebAPI.Models.DTO
 
         public int UserId { get; set; }
 
+        public string UserFirstLastName { get; set; }
+
         public DateTime DateTime { get; set; }
 
         public int? GroupId { get; set; }

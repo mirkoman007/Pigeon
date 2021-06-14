@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebAPI</name>
+    </assembly>
+    <members>
+        <member name="T:WebAPI.Controllers.FriendsController">
+            <summary>
+            Defines the <see cref="T:WebAPI.Controllers.FriendsController" />.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.FriendsController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.FriendsController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.FriendsController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.SendFriendRequest(System.Int32,System.Int32)">
+            <summary>
+            Main method for sending friend requests.
+            </summary>
+            <param name="userRequestID">User who sends the friend request.</param>
+            <param name="userRespondID">User who receives the friend request.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.GetAllFriendRequestForUserID(System.Int32)">
+            <summary>
+            Gets all friend requests for given user id.
+            </summary>
+            <param name="id">User id.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.AcceptFriendRequest(System.Int32)">
+            <summary>
+            Accept friend request based on friend request id.
+            </summary>
+            <param name="friendRequestId">User id.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.AcceptFriendRequestBasedOnIds(System.Int32,System.Int32)">
+            <summary>
+            Accept friend request based on user request id and user respond id.
+            </summary>
+            <param name="userOneId">The userOneId<see cref="T:System.Int32"/>.</param>
+            <param name="userTwoId">The userTwoId<see cref="T:System.Int32"/>.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.DeclineFriendRequest(System.Int32)">
+            <summary>
+            Decline friend request based on friend request id.
+            </summary>
+            <param name="friendRequestId">User id.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.DeclineFriendRequestBasedOnIds(System.Int32,System.Int32)">
+            <summary>
+            Decline friend request based on user request id and user respond id.
+            </summary>
+            <param name="userOneId">The userOneId<see cref="T:System.Int32"/>.</param>
+            <param name="userTwoId">The userTwoId<see cref="T:System.Int32"/>.</param>
+            <returns>.</returns>
+        </member>
+        <member name="T:WebAPI.Controllers.PostController">
+            <summary>
+            Defines the <see cref="T:WebAPI.Controllers.PostController" />.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.PostController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.PostController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.PostController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.GetSpecificPost(System.Int32)">
+            <summary>
+            Get specified post by it's id.
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.GetFriendPosts(System.Int32)">
+            <summary>
+            Get all posts only made by provided user id friends.
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.GetUserAllPosts(System.Int32)">
+            <summary>
+            Gets all posts from specified user.
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.CreatePost(WebAPI.Models.Command.CreatePostCommand)">
+            <summary>
+            Creates post (groupId should be null for normal user posts | Posts made inside group should have group id)
+            </summary>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.CreatePostCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.UpdatePost(System.Int32,WebAPI.Models.Command.CreatePostCommand)">
+            <summary>
+            Updates post
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.CreatePostCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.DeletePost(System.Int32)">
+            <summary>
+            Deletes post
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/>.</returns>
+        </member>
+        <member name="F:WebAPI.Controllers.SecurePasswordHasher.SaltSize">
+            <summary>
+            Size of salt.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.SecurePasswordHasher.HashSize">
+            <summary>
+            Size of hash.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.SecurePasswordHasher.Hash(System.String,System.Int32)">
+            <summary>
+            Creates a hash from a password.
+            </summary>
+            <param name="password">The password.</param>
+            <param name="iterations">Number of iterations.</param>
+            <returns>The hash.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.SecurePasswordHasher.Hash(System.String)">
+            <summary>
+            Creates a hash from a password with 10000 iterations
+            </summary>
+            <param name="password">The password.</param>
+            <returns>The hash.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.SecurePasswordHasher.IsHashSupported(System.String)">
+            <summary>
+            Checks if hash is supported.
+            </summary>
+            <param name="hashString">The hash.</param>
+            <returns>Is supported?</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.SecurePasswordHasher.Verify(System.String,System.String)">
+            <summary>
+            Verifies a password against a hash.
+            </summary>
+            <param name="password">The password.</param>
+            <param name="hashedPassword">The hash.</param>
+            <returns>Could be verified?</returns>
+        </member>
+        <member name="T:WebAPI.Controllers.UsersController">
+            <summary>
+            Defines the <see cref="T:WebAPI.Controllers.UsersController" />.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.UsersController._userRepository">
+            <summary>
+            Defines the _userRepository.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.UsersController._cityRepository">
+            <summary>
+            Defines the _cityRepository.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.UsersController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.UsersController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.UsersController._appSettings">
+            <summary>
+            Defines the _appSettings.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper,Microsoft.Extensions.Options.IOptions{WebAPI.Data.AppSettings})">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.UsersController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+            <param name="appsettings">The appsettings<see cref="T:Microsoft.Extensions.Options.IOptions`1"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.Authenticate(WebAPI.Models.Command.AuthenticateUserCommand)">
+            <summary>
+            Authenticate user by sending email and password in request body. If authorized this will return bearer header token property for further authorization
+            </summary>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.AuthenticateUserCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.Register(WebAPI.Models.Command.RegisterUserCommand)">
+            <summary>
+            Register user
+            </summary>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.RegisterUserCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.GetUsers">
+            <summary>
+            Gets all users
+            </summary>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;User&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.GetUser(System.Int32)">
+            <summary>
+            Gets one user
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;UserDto&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.Update(System.Int32,WebAPI.Models.Command.UpdateUserCommand)">
+            <summary>
+            Update user
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateUserCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.UpdatePassword(System.Int32,WebAPI.Models.Command.UpdateUserPasswordCommand)">
+            <summary>
+            Update password
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateUserPasswordCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.DeleteUser(System.Int32)">
+            <summary>
+            Delete user
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="T:System.Threading.Tasks.Task`1"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.VerifyUser(System.Int32)">
+            <summary>
+            Verify user(probably used to send email link)
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;UserDto&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.CreateUserWithGenderAndCityRegister(WebAPI.Models.Command.RegisterUserCommand)">
+            <summary>
+            The CreateUserWithGenderAndCityRegister.
+            </summary>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.RegisterUserCommand"/>.</param>
+            <returns>The <see cref="T:WebAPI.Models.User"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.CreateUserWithGenderAndCityUpdate(WebAPI.Models.Command.UpdateUserCommand)">
+            <summary>
+            The CreateUserWithGenderAndCityUpdate.
+            </summary>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateUserCommand"/>.</param>
+            <returns>The <see cref="T:WebAPI.Models.User"/>.</returns>
+        </member>
+    </members>
+</doc>

@@ -1,33 +1,52 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using WebAPI.Data;
-using WebAPI.Models;
-using WebAPI.Models.Command;
-using WebAPI.Models.DTO;
-
-namespace WebAPI.Controllers
+﻿namespace WebAPI.Controllers
 {
+    using AutoMapper;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using WebAPI.Data;
+    using WebAPI.Models;
+    using WebAPI.Models.Command;
+    using WebAPI.Models.DTO;
+
+    /// <summary>
+    /// Defines the <see cref="PostController" />.
+    /// </summary>
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PostController : Controller
     {
+        /// <summary>
+        /// Defines the _context.
+        /// </summary>
         private readonly PigeonContext _context;
 
+        /// <summary>
+        /// Defines the _mapper.
+        /// </summary>
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostController"/> class.
+        /// </summary>
+        /// <param name="context">The context<see cref="PigeonContext"/>.</param>
+        /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         public PostController(PigeonContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get specified post by it's id.
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
         [HttpGet("{id:int}")]
         public async Task<ActionResult<IEnumerable<Post>>> GetSpecificPost([FromRoute] int id)
         {
@@ -42,10 +61,72 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all posts only made by provided user id friends.
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
+        [HttpGet("{id:int}/friends")]
+        public async Task<ActionResult<IEnumerable<Post>>> GetFriendPosts([FromRoute] int id)
+        {
+            var FriendListMain = _context.Friends.Where(x => x.UserRequestId == id).ToList();
+            var FriendListSecondary = _context.Friends.Where(x => x.UserResponderId == id).ToList();
+            var FriendList = FriendListMain.Concat(FriendListSecondary).ToList();
+
+            var FriendIds = new List<int>();
+            foreach (var user in FriendList)
+            {
+                if(user.UserRequestId == id)
+                {
+                    FriendIds.Add((int)user.UserResponderId);
+                }
+                if (user.UserResponderId == id)
+                {
+                    FriendIds.Add((int)user.UserRequestId);
+                }
+            }
+
+            var posts = new List<Post>();
+
+            foreach (var idUser in FriendIds)
+            {
+                var postsTemp = _context.Posts.Include(x => x.User).Where(x => x.UserId == idUser).ToList();
+                foreach (var tempPost in postsTemp)
+                {
+                    posts.Add(tempPost);
+                }
+            }
+            if (!posts.Any())
+            {
+                return NotFound("There are 0 posts made by this user's friends :(");
+            }
+            var FinalPosts = new List<PostDto>();
+            foreach (var item in posts)
+            {
+                var postDto = new PostDto
+                {
+                    DateTime = (DateTime)item.DateTime,
+                    GroupId = item.GroupId,
+                    IdPost = item.Idpost,
+                    MediaId = item.MediaId,
+                    Text = item.Text,
+                    UserFirstLastName = item.User.FirstName + " " + item.User.LastName,
+                    UserId = item.UserId
+                };
+                FinalPosts.Add(postDto);
+            }
+            return Ok(FinalPosts);
+        }
+
+        /// <summary>
+        /// Gets all posts from specified user.
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
         [HttpGet("user/{id:int}")]
         public async Task<ActionResult<IEnumerable<Post>>> GetUserAllPosts([FromRoute] int id)
         {
-            var posts = _context.Posts.Where(x => x.UserId == id);
+            var posts = _context.Posts.Include(x => x.User).Where(x => x.UserId == id);
             if (posts != null)
             {
                 return await Task.FromResult(Ok(_mapper.Map<List<PostDto>>(posts)));
@@ -56,6 +137,11 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates post (groupId should be null for normal user posts | Posts made inside group should have group id)
+        /// </summary>
+        /// <param name="model">The model<see cref="CreatePostCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [HttpPost]
         public IActionResult CreatePost([FromBody] CreatePostCommand model)
         {
@@ -98,10 +184,16 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates post
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <param name="model">The model<see cref="CreatePostCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
         [HttpPut("update/{id:int}")]
-        public IActionResult UpdatePost([FromRoute]int id,[FromBody] CreatePostCommand model)
+        public IActionResult UpdatePost([FromRoute] int id, [FromBody] CreatePostCommand model)
         {
-            if(model.UserId == null)
+            if (model.UserId == null)
             {
                 return BadRequest("UserId property cannot be null");
             }
@@ -140,6 +232,11 @@ namespace WebAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes post
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{IActionResult}"/>.</returns>
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeletePost([FromRoute] int id)
         {
@@ -154,6 +251,5 @@ namespace WebAPI.Controllers
 
             return Ok();
         }
-
     }
 }
