@@ -128,6 +128,26 @@
             <param name="model">The model<see cref="T:WebAPI.Models.Command.CreatePostCommand"/>.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
         </member>
+        <member name="M:WebAPI.Controllers.PostController.AddPostReaction(System.Int32,System.Int32,System.String)">
+            <summary>
+            Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.UpdatePostReaction(System.Int32,System.Int32,System.String)">
+            <summary>
+            Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.DeletePostReaction(System.Int32,System.Int32)">
+            <summary>
+            Deletes user reaction to post
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.GetPostReactionsAndUsers(System.Int32)">
+            <summary>
+            Gets specific post reactions and users
+            </summary>
+        </member>
         <member name="M:WebAPI.Controllers.PostController.UpdatePost(System.Int32,WebAPI.Models.Command.CreatePostCommand)">
             <summary>
             Updates post

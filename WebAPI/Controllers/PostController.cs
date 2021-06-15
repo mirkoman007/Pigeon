@@ -186,6 +186,130 @@
         }
 
         /// <summary>
+        /// Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+        /// </summary>
+        [HttpPost("reaction/{postId}/{userId}/{reactionName}")]
+        public IActionResult AddPostReaction([FromRoute] int postId, int userId, string reactionName)
+        {
+            if(_context.Posts.Find(postId) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            if (_context.Users.Find(userId) == null)
+            {
+                return NotFound("User with this userId does not exist");
+            }
+            if (!_context.Reactions.Where(x =>x.Value == reactionName).Any())
+            {
+                return NotFound("Reaction with this name does not exist");
+            }
+            var allPostsReactions = _context.PostReactions.Where(x => x.PostId == postId).ToList();
+            foreach (var item in allPostsReactions)
+            {
+                if(item.UserId == userId)
+                {
+                    return BadRequest("Reaction to this post already exists from this user");
+                }
+            }
+            var postReaction = new PostReaction
+            {
+                PostId = postId,
+                ReactionId = _context.Reactions.Where(x => x.Value == reactionName).First().Idreaction,
+                UserId = userId
+            };
+
+            _context.PostReactions.Add(postReaction);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        /// <summary>
+        /// Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+        /// </summary>
+        [HttpPut("reaction/{postId}/{userId}/{reactionName}")]
+        public IActionResult UpdatePostReaction([FromRoute] int postId, int userId, string reactionName)
+        {
+            if (_context.Posts.Find(postId) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            if (_context.Users.Find(userId) == null)
+            {
+                return NotFound("User with this userId does not exist");
+            }
+            if (!_context.Reactions.Where(x => x.Value == reactionName).Any())
+            {
+                return NotFound("Reaction with this name does not exist");
+            }
+            var allPostsReactions = _context.PostReactions.Where(x => x.PostId == postId).ToList();
+            foreach (var item in allPostsReactions)
+            {
+                if (item.UserId == userId)
+                {
+                    item.ReactionId = _context.Reactions.Where(x => x.Value == reactionName).First().Idreaction;
+                    _context.SaveChanges();
+                    return Ok();
+                }
+            }
+            return BadRequest("Error while trying to update post reaction");
+        }
+
+        /// <summary>
+        /// Deletes user reaction to post
+        /// </summary>
+        [HttpDelete("reaction/{postId}/{userId}")]
+        public IActionResult DeletePostReaction([FromRoute] int postId, int userId)
+        {
+            if (_context.Posts.Find(postId) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            if (_context.Users.Find(userId) == null)
+            {
+                return NotFound("User with this userId does not exist");
+            }
+            var allPostsReactions = _context.PostReactions.Where(x => x.PostId == postId).ToList();
+            foreach (var item in allPostsReactions)
+            {
+                if (item.UserId == userId)
+                {
+                    _context.PostReactions.Remove(item);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+            }
+            return BadRequest("Error while trying to delete post reaction");
+        }
+
+        /// <summary>
+        /// Gets specific post reactions and users
+        /// </summary>
+        [HttpGet("reaction/{postId}")]
+        public async Task<ActionResult<IEnumerable<PostReactionDto>>> GetPostReactionsAndUsers([FromRoute] int postId)
+        {
+            if (_context.Posts.Find(postId) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            var posts = _context.PostReactions.Include(x =>x.User).Where(x => x.PostId == postId).ToList();
+            var postsFinal = new List<PostReactionDto>();
+            if(posts.Count == 0)
+            {
+                return BadRequest("There are no reactions to this post yet");
+            }
+            foreach (var item in posts)
+            {
+                postsFinal.Add(new PostReactionDto
+                {
+                    FirstLastName = _context.Users.Find(item.UserId).FirstName + " " + _context.Users.Find(item.UserId).LastName,
+                    IdPostReaction = item.IdpostReaction,
+                    ReactionName = _context.Reactions.Find(item.ReactionId).Value
+                });
+            }
+            return Ok(postsFinal);
+        }
+
+        /// <summary>
         /// Updates post
         /// </summary>
         /// <param name="id">The id<see cref="int"/>.</param>
