@@ -105,21 +105,21 @@
             Get specified post by it's id.
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
-            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;PostDto&gt;&gt;&gt;"/>.</returns>
         </member>
         <member name="M:WebAPI.Controllers.PostController.GetFriendPosts(System.Int32)">
             <summary>
-            Get all posts only made by provided user id friends.
+            Get all posts only made by provided user id and user's friends.
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
-            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;List&lt;PostDto&gt;&gt;&gt;"/>.</returns>
         </member>
         <member name="M:WebAPI.Controllers.PostController.GetUserAllPosts(System.Int32)">
             <summary>
             Gets all posts from specified user.
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
-            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;Post&gt;&gt;&gt;"/>.</returns>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;PostDto&gt;&gt;&gt;"/>.</returns>
         </member>
         <member name="M:WebAPI.Controllers.PostController.CreatePost(WebAPI.Models.Command.CreatePostCommand)">
             <summary>

@@ -46,9 +46,9 @@
         /// Get specified post by it's id.
         /// </summary>
         /// <param name="id">The id<see cref="int"/>.</param>
-        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{PostDto}}}"/>.</returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<IEnumerable<Post>>> GetSpecificPost([FromRoute] int id)
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetSpecificPost([FromRoute] int id)
         {
             var post = _context.Posts.Find(id);
             if (post != null)
@@ -62,18 +62,19 @@
         }
 
         /// <summary>
-        /// Get all posts only made by provided user id friends.
+        /// Get all posts only made by provided user id and user's friends.
         /// </summary>
         /// <param name="id">The id<see cref="int"/>.</param>
-        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
+        /// <returns>The <see cref="Task{ActionResult{List{PostDto}}}"/>.</returns>
         [HttpGet("{id:int}/friends")]
-        public async Task<ActionResult<IEnumerable<Post>>> GetFriendPosts([FromRoute] int id)
+        public async Task<ActionResult<List<PostDto>>> GetFriendPosts([FromRoute] int id)
         {
             var FriendListMain = _context.Friends.Where(x => x.UserRequestId == id).ToList();
             var FriendListSecondary = _context.Friends.Where(x => x.UserResponderId == id).ToList();
             var FriendList = FriendListMain.Concat(FriendListSecondary).ToList();
 
             var FriendIds = new List<int>();
+            FriendIds.Add(id);
             foreach (var user in FriendList)
             {
                 if(user.UserRequestId == id)
@@ -122,9 +123,9 @@
         /// Gets all posts from specified user.
         /// </summary>
         /// <param name="id">The id<see cref="int"/>.</param>
-        /// <returns>The <see cref="Task{ActionResult{IEnumerable{Post}}}"/>.</returns>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{PostDto}}}"/>.</returns>
         [HttpGet("user/{id:int}")]
-        public async Task<ActionResult<IEnumerable<Post>>> GetUserAllPosts([FromRoute] int id)
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetUserAllPosts([FromRoute] int id)
         {
             var posts = _context.Posts.Include(x => x.User).Where(x => x.UserId == id);
             if (posts != null)

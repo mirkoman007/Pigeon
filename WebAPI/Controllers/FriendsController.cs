@@ -50,6 +50,12 @@
         [HttpPost("request/send/{userRequestID}/{userRespondID}")]
         public async Task<IActionResult> SendFriendRequest([FromRoute] int userRequestID, [FromRoute] int userRespondID)
         {
+            if((_context.Friends.Where(x => x.UserRequestId == userRequestID).Any() && _context.Friends.Where(x=>x.UserResponderId == userRespondID).Any())
+                || (_context.Friends.Where(x => x.UserRequestId == userRespondID).Any() && _context.Friends.Where(x => x.UserResponderId == userRequestID).Any()))
+            {
+                return BadRequest("These users are already friends!");
+            }
+
             if (_context.Users.Find(userRequestID) == null)
             {
                 return BadRequest("User for this request Id does not exist");
