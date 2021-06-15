@@ -239,7 +239,13 @@
             <summary>
             Gets all users
             </summary>
-            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;User&gt;&gt;&gt;"/>.</returns>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;UserDto&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.FindUsers(WebAPI.Models.Command.SearchUserCommand)">
+            <summary>
+            Finds all users that contain given string(specified in request body) in their first or last name
+            </summary>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;SearchUserDto&gt;&gt;&gt;"/>.</returns>
         </member>
         <member name="M:WebAPI.Controllers.UsersController.GetUser(System.Int32)">
             <summary>

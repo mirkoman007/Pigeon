@@ -141,12 +141,59 @@
         /// <summary>
         /// Gets all users
         /// </summary>
-        /// <returns>The <see cref="Task{ActionResult{IEnumerable{User}}}"/>.</returns>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{UserDto}}}"/>.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
             IEnumerable<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
             return Ok(_mapper.Map<IEnumerable<UserDto>>(users));
+        }
+
+        // GET: api/Users
+        /// <summary>
+        /// Finds all users that contain given string(specified in request body) in their first or last name
+        /// </summary>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{SearchUserDto}}}"/>.</returns>
+        [HttpPost("search")]
+        public async Task<ActionResult<List<SearchUserDto>>> FindUsers([FromBody] SearchUserCommand command)
+        {
+            string[] searchString = command.SearchString.Split(null);
+            var firstPart = string.IsNullOrEmpty(searchString[0]) ? "" : searchString[0];
+            var secondPart =  searchString.Length <= 1 ? "" : searchString[1];
+            List<User> users = _context.Users.Include(x => x.Gender).Include(x => x.City).ToList();
+
+            var usersOne = users.Where(x => x.FirstName.ToLower().StartsWith(firstPart.ToLower())).ToList();
+            var usersThree = users.Where(x => x.LastName.ToLower().StartsWith(firstPart.ToLower())).ToList();
+            var usersTwo = new List<User>();
+            var usersFour = new List<User>();
+            if (!string.IsNullOrEmpty(secondPart))
+            {
+                usersTwo = users.Where(x => x.FirstName.ToLower().StartsWith(secondPart.ToLower())).ToList();
+                usersFour = users.Where(x => x.LastName.ToLower().StartsWith(secondPart.ToLower())).ToList();
+            }
+            var allUsers = usersOne.Concat(usersTwo).Concat(usersThree).Concat(usersFour).ToList();
+            var finalUsers = new List<SearchUserDto>();
+            if (allUsers.Count() == 0)
+            {
+                return NotFound("No users found for this search string");
+            }
+            else
+            {
+                
+                foreach (var user in allUsers)
+                {
+                    var usTemp = new SearchUserDto
+                    {
+                        City = _context.Cities.Find(user.CityId).Name,
+                        Email = user.Email,
+                        FirstLastName = user.FirstName + " " + user.LastName,
+                        Gender = _context.Genders.Find(user.GenderId).Name,
+                        IdUser = user.Iduser
+                    };
+                    finalUsers.Add(usTemp);
+                }
+                return Ok(finalUsers);
+            }
         }
 
         // GET: api/Users/5
