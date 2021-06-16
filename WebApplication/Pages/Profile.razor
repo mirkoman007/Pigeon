@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inject IAuthenticationService AuthenticationService
 @inject IPostService PostService
+@inject NavigationManager NavigationManager
 
 <h3>@AuthenticationService.User.FirstName @AuthenticationService.User.LastName</h3>
 
@@ -10,72 +11,117 @@
 
 
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Info</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><span class="oi oi-home" aria-hidden="true"></span> Lives in: @AuthenticationService.User.City</li>
-                        <li class="list-group-item"><span class="oi oi-calendar" aria-hidden="true"></span> Born: @AuthenticationService.User.Birthday.ToShortDateString()</li>
-                        <li class="list-group-item">Gender: @AuthenticationService.User.Gender</li>
-                    </ul>
-                </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Info</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><span class="oi oi-home" aria-hidden="true"></span> Lives in: @AuthenticationService.User.City</li>
+                    <li class="list-group-item"><span class="oi oi-calendar" aria-hidden="true"></span> Born: @AuthenticationService.User.Birthday.ToShortDateString()</li>
+                    <li class="list-group-item">Gender: @AuthenticationService.User.Gender</li>
+                </ul>
             </div>
         </div>
-        <div class="col-md-8">
-            <div class="card mb-3">
-                <div class="card-body">
-                    <input type="text" class="form-control mb-3" placeholder="Your post here ....." />
-                    <button type="button" class="btn btn-success btn-sm">POST</button>
+    </div>
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+
+                    <InputText @bind-Value="model.Text" class="form-control mb-3" placeholder="Your post here ....." />
+                    <button disabled="@postLoading" class="btn btn-success btn-sm">
+                        @if (postLoading)
+                        {
+                            <span class="spinner-border spinner-border-sm mr-1"></span>}
+                        POST
+                    </button>
+                    @if (!string.IsNullOrEmpty(error))
+                    {
+                        <div class="alert alert-danger mt-3 mb-0">@error</div>
+                    }
+                </EditForm>
+            </div>
+        </div>
+        @if (loading == true)
+        {
+            <div class="d-flex justify-content-center">
+                <div class="spinner-grow text-success" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <div class="spinner-grow text-success" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <div class="spinner-grow text-success" role="status">
+                    <span class="sr-only"></span>
                 </div>
             </div>
-            @if (loading == true)
+        }
+        else
+        {
+            @if (posts == null)
             {
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-grow text-success" role="status">
-                        <span class="sr-only"></span>
-                    </div>
-                    <div class="spinner-grow text-success" role="status">
-                        <span class="sr-only"></span>
-                    </div>
-                    <div class="spinner-grow text-success" role="status">
-                        <span class="sr-only"></span>
-                    </div>
-                </div>
+                <p>No posts :(</p>
             }
             else
             {
-                @if (posts == null)
+                @foreach (var post in posts)
                 {
-                    <p>No posts :(</p>
-                }
-                else
-                {
-                    @foreach (var post in posts)
-                    {
 
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <p class="card-text">@post.Text</p>
-                                <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
-                                <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
-                                <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-share" aria-hidden="true" /> Share</button>
-                            </div>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p class="card-text">@post.Text</p>
+                            <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
+                            <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
+                            <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-share" aria-hidden="true" /> Share</button>
                         </div>
-                    }
+                    </div>
                 }
             }
-        </div>
+        }
     </div>
+</div>
 
 @code {
     private bool loading;
-    private IEnumerable<Post> posts;
+    private IList<Post> posts;
+    private bool postLoading;
+    private AddPost model = new AddPost();
+    private string error;
+
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadPosts();
+
+    }
+
+    private async void OnValidSubmit()
+    {
+        postLoading = true;
+        try
+        {
+            model.UserId = AuthenticationService.User.IdUser;
+            await PostService.AddPost(model);
+            postLoading = false;
+            posts.Clear();
+            await LoadPosts();
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            postLoading = false;
+            StateHasChanged();
+        }
+    }
+
+
+    async Task LoadPosts()
     {
         loading = true;
         posts = await PostService.GetUserPost(AuthenticationService.User.IdUser);
         loading = false;
     }
+
 }
