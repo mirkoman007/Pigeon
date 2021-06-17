@@ -299,7 +299,7 @@
         </member>
         <member name="M:WebAPI.Controllers.UsersController.VerifyUser(System.Int32)">
             <summary>
-            Verify user(probably used to send email link)
+            Verify user
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
             <returns>The <see cref="!:Task&lt;ActionResult&lt;UserDto&gt;&gt;"/>.</returns>

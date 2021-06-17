@@ -81,6 +81,9 @@
             if (user == null)
                 return BadRequest(new { message = "Email or password is incorrect" });
 
+            if (user.Verification==false)
+                return BadRequest(new { message = "Your account hasn't been verified" });
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -299,25 +302,26 @@
         }
 
         /// <summary>
-        /// Verify user(probably used to send email link)
+        /// Verify user
         /// </summary>
         /// <param name="id">The id<see cref="int"/>.</param>
         /// <returns>The <see cref="Task{ActionResult{UserDto}}"/>.</returns>
+        [AllowAnonymous]
         [HttpGet("verify/{id}")]
         public async Task<ActionResult<UserDto>> VerifyUser([FromRoute] int id)
         {
             List<User> users = await _context.Users.Include(x => x.Gender).Include(x => x.UserType).Include(x => x.City).ToListAsync();
             var user = users.Find(x => x.Iduser == id);
-            user.Verification = true;
-            _context.Users.Update(user);
-            _context.SaveChanges();
-            user.PasswordHash = null;
-            if (user == null)
+            if (user == null || user.Verification==true)
             {
                 return NotFound();
             }
             else
             {
+                user.Verification = true;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+                user.PasswordHash = null;
                 return await Task.FromResult(Ok(_mapper.Map<UserDto>(user)));
             }
         }

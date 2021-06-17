@@ -1,0 +1,43 @@
+﻿@page "/register/verify/{UserID:int}"
+@inject IAuthenticationService AuthenticationService
+
+@if (loaded)
+    @if (notFound)
+    {
+        <div class="alert alert-danger" role="alert">
+            <p>Already verified or link expired</p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success" role="alert">
+            <p>Congratulations @user.FirstName @user.LastName, your account has been successfully verified.</p>
+        </div>
+    }
+
+<NavLink href="" class="btn btn-secondary">Back</NavLink>
+
+
+@code {
+
+    private User user;
+    private bool notFound;
+    private bool loaded;
+
+    [Parameter]
+    public int UserID { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            user = await AuthenticationService.Verify(UserID);
+        }
+        catch
+        {
+            notFound = true;
+        }
+        loaded = true;
+    }
+}

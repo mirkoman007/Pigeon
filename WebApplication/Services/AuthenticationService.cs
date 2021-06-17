@@ -15,6 +15,7 @@ namespace WebApplication.Services
         Task Login(string email, string password);
         Task Logout();
         Task Register(RegUser model);
+        Task<User> Verify(int IdUser);
     }
 
     public class AuthenticationService : IAuthenticationService
@@ -53,6 +54,11 @@ namespace WebApplication.Services
         public async Task Register(RegUser model)
         {
             await _httpService.Post("/api/users/register", model);
+        }
+
+        public async Task<User> Verify(int IdUser)
+        {
+            return await _httpService.Get<User>($"/api/users/verify/{IdUser}");
         }
     }
 }
