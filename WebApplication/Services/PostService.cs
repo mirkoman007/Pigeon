@@ -9,6 +9,7 @@ namespace WebApplication.Services
     public interface IPostService
     {
         Task<IList<Post>> GetUserPost(int id);
+        Task<IList<Post>> GetFriendsUserPost(int id);
         Task AddPost(AddPost model);
 
     }
@@ -25,6 +26,11 @@ namespace WebApplication.Services
         public async Task<IList<Post>> GetUserPost(int id)
         {
             return await _httpService.Get<IList<Post>>($"/api/post/user/{id}");
+
+        }
+        public async Task<IList<Post>> GetFriendsUserPost(int id)
+        {
+            return await _httpService.Get<IList<Post>>($"/api/post/{id}/friends");
 
         }
 

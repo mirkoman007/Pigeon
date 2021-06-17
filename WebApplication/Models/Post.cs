@@ -9,5 +9,8 @@ namespace WebApplication.Models
     {
         public int IdPost { get; set; }
         public string Text { get; set; }
+        public int UserId { get; set; }
+        public string UserFirstLastName { get; set; }
+        public DateTime DateTime { get; set; }
     }
 }
