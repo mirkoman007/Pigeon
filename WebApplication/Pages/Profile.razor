@@ -1,10 +1,16 @@
 ﻿@page "/profile"
+@page "/profile/{UserID:int}"
 @attribute [Authorize]
 @inject IAuthenticationService AuthenticationService
+@inject IFriendService FriendService
 @inject IPostService PostService
+@inject IUserService UserService
 @inject NavigationManager NavigationManager
 
-<h3>@AuthenticationService.User.FirstName @AuthenticationService.User.LastName</h3>
+
+@if (user != null) { 
+<h3>@user.FirstName @user.LastName</h3>
+}
 
 
 <div class="row">
@@ -12,36 +18,64 @@
 
 
     <div class="col-md-4">
-        <div class="card">
+        <div class="card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Info</h5>
+                <h5 class="card-title"><span class="oi oi-info" aria-hidden="true" /> Info</h5>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><span class="oi oi-home" aria-hidden="true"></span> Lives in: @AuthenticationService.User.City</li>
-                    <li class="list-group-item"><span class="oi oi-calendar" aria-hidden="true"></span> Born: @AuthenticationService.User.Birthday.ToShortDateString()</li>
-                    <li class="list-group-item">Gender: @AuthenticationService.User.Gender</li>
+                    @if (user != null)
+                    {
+                        <li class="list-group-item">Lives in: @user.City</li>
+                        <li class="list-group-item">Born: @user.Birthday.ToShortDateString()</li>
+                        <li class="list-group-item">Gender: @user.Gender</li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><span class="oi oi-people" aria-hidden="true" /> Friends</h5>
+                <ul class="list-group list-group-flush">
+                    @if (friends != null && friends.Count == 0)
+                    {
+                        <li class="list-group-item">You currently have no friends</li>
+                    }
+                    else if (friends != null)
+                    {
+                        int size = 6;
+                        if (friends.Count < size)
+                            size = friends.Count;
+                        @for (int i = 0; i < size; i++)
+                        {
+
+                            <li class="list-group-item"><a href="/profile/@friends[i].FriendId">@friends[i].FirstLastName</a></li>
+                        }
+                    }
                 </ul>
             </div>
         </div>
     </div>
     <div class="col-md-8">
-        <div class="card mb-3">
-            <div class="card-body">
-                <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-                    <InputText @bind-Value="model.Text" class="form-control mb-3" placeholder="Your post here ....." />
-                    <button disabled="@postLoading" class="btn btn-success btn-sm">
-                        @if (postLoading)
+        @if (yourProfile)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                        <InputText @bind-Value="model.Text" class="form-control mb-3" placeholder="Your post here ....." />
+                        <button disabled="@postBtnLoading" class="btn btn-success btn-sm">
+                            @if (postBtnLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>}
+                            POST
+                        </button>
+                        @if (!string.IsNullOrEmpty(error))
                         {
-                            <span class="spinner-border spinner-border-sm mr-1"></span>}
-                        POST
-                    </button>
-                    @if (!string.IsNullOrEmpty(error))
-                    {
-                        <div class="alert alert-danger mt-3 mb-0">@error</div>
-                    }
-                </EditForm>
+                            <div class="alert alert-danger mt-3 mb-0">@error</div>
+                        }
+                    </EditForm>
+                </div>
             </div>
-        </div>
-        @if (loading == true)
+        }
+        @if (postsLoading == true)
         {
             <div class="d-flex justify-content-center">
                 <div class="spinner-grow text-success" role="status">
@@ -57,9 +91,11 @@
         }
         else
         {
-            @if (posts == null)
+            @if (posts.Count == 0)
             {
-                <p>No posts :(</p>
+                <div class="alert alert-danger" role="alert">
+                    <p>No posts 😥</p>
+                </div>
             }
             else
             {
@@ -68,7 +104,7 @@
 
                     <div class="card mb-3">
                         <div class="card-body">
-                            <p class="card-text">@post.UserFirstLastName (@post.DateTime)</p>
+                            <p class="card-text"><a href="/profile/@post.UserId">@post.UserFirstLastName</a> (<a href="/post/@post.IdPost">@post.DateTime</a>)</p>
                             <p class="card-text">@post.Text</p>
                             <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
                             <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
@@ -82,27 +118,41 @@
 </div>
 
 @code {
-    private bool loading;
+    [Parameter]
+    public int UserID { get; set; }
+    private bool yourProfile;
+
+    private bool postsLoading;
+    private bool postBtnLoading;
     private IList<Post> posts;
-    private bool postLoading;
+    private IList<Friend> friends;
+    private User user;
     private AddPost model = new AddPost();
     private string error;
 
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadPosts();
+        yourProfile = false;
+        if (UserID == 0 || UserID== AuthenticationService.User.IdUser)
+        {
+            yourProfile = true;
+            UserID = AuthenticationService.User.IdUser;
+        }
 
+        await LoadPosts();
+        await LoadFriends();
+        await LoadProfileInfo();
     }
 
     private async void OnValidSubmit()
     {
-        postLoading = true;
+        postBtnLoading = true;
         try
         {
-            model.UserId = AuthenticationService.User.IdUser;
+            model.UserId = UserID;
             await PostService.AddPost(model);
-            postLoading = false;
+            postBtnLoading = false;
             posts.Clear();
             await LoadPosts();
             StateHasChanged();
@@ -111,7 +161,7 @@
         catch (Exception ex)
         {
             error = ex.Message;
-            postLoading = false;
+            postBtnLoading = false;
             StateHasChanged();
         }
     }
@@ -119,11 +169,28 @@
 
     async Task LoadPosts()
     {
-        loading = true;
-        posts = await PostService.GetUserPost(AuthenticationService.User.IdUser);
+        postsLoading = true;
+        posts = await PostService.GetUserPost(UserID);
+        postsLoading = false;
+    }
+
+    async Task LoadFriends()
+    {
+        friends = await FriendService.GetAllFriends(UserID);
+    }
+
+    async Task LoadProfileInfo()
+    {
+        user = await UserService.GetUser(UserID);
+    }
 
 
-        loading = false;
+    protected override async void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        await OnInitializedAsync();
+        StateHasChanged();
     }
 
 }

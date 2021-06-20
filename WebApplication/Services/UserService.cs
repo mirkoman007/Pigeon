@@ -9,6 +9,7 @@ namespace WebApplication.Services
     public interface IUserService
     {
         Task<IEnumerable<User>> GetAll();
+        Task<User> GetUser(int id);
     }
 
     public class UserService : IUserService
@@ -23,6 +24,10 @@ namespace WebApplication.Services
         public async Task<IEnumerable<User>> GetAll()
         {
             return await _httpService.Get<IEnumerable<User>>("/api/users");
+        }
+        public async Task<User> GetUser(int id)
+        {
+            return await _httpService.Get<User>($"/api/users/{id}");
         }
     }
 }

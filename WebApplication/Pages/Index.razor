@@ -13,8 +13,8 @@
             <div class="card-body">
                 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
                     <InputText @bind-Value="model.Text" class="form-control mb-3" placeholder="Your post here ....." />
-                    <button disabled="@postLoading" class="btn btn-success btn-sm">
-                        @if (postLoading)
+                    <button disabled="@postBtnLoading" class="btn btn-success btn-sm">
+                        @if (postBtnLoading)
                         {
                             <span class="spinner-border spinner-border-sm mr-1"></span>}
                         POST
@@ -26,7 +26,7 @@
                 </EditForm>
             </div>
         </div>
-        @if (loading == true)
+        @if (postsLoading == true)
         {
             <div class="d-flex justify-content-center">
                 <div class="spinner-grow text-success" role="status">
@@ -42,9 +42,11 @@
         }
         else
         {
-            @if (posts == null)
+            @if (posts.Count == 0)
             {
-                <p>No posts :(</p>
+                <div class="alert alert-danger" role="alert">
+                    <p>No posts 😥</p>
+                </div>
             }
             else
             {
@@ -53,7 +55,7 @@
 
                     <div class="card mb-3">
                         <div class="card-body">
-                            <p class="card-text">@post.UserFirstLastName (@post.DateTime)</p>
+                            <p class="card-text"><a href="/profile/@post.UserId">@post.UserFirstLastName</a> (<a href="/post/@post.IdPost">@post.DateTime</a>)</p>
                             <p class="card-text">@post.Text</p>
                             <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
                             <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
@@ -86,9 +88,9 @@
 </div>
 
 @code {
-    private bool loading;
+    private bool postsLoading;
+    private bool postBtnLoading;
     private IList<Post> posts;
-    private bool postLoading;
     private AddPost model = new AddPost();
     private string error;
 
@@ -101,12 +103,12 @@
 
     private async void OnValidSubmit()
     {
-        postLoading = true;
+        postBtnLoading = true;
         try
         {
             model.UserId = AuthenticationService.User.IdUser;
             await PostService.AddPost(model);
-            postLoading = false;
+            postBtnLoading = false;
             posts.Clear();
             await LoadPosts();
             StateHasChanged();
@@ -115,7 +117,7 @@
         catch (Exception ex)
         {
             error = ex.Message;
-            postLoading = false;
+            postBtnLoading = false;
             StateHasChanged();
         }
     }
@@ -123,11 +125,9 @@
 
     async Task LoadPosts()
     {
-        loading = true;
+        postsLoading = true;
         posts = await PostService.GetFriendsUserPost(AuthenticationService.User.IdUser);
-
-
-        loading = false;
+        postsLoading = false;
     }
 
 }
