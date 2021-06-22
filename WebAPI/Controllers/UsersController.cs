@@ -174,7 +174,7 @@
                 usersTwo = users.Where(x => x.FirstName.ToLower().StartsWith(secondPart.ToLower())).ToList();
                 usersFour = users.Where(x => x.LastName.ToLower().StartsWith(secondPart.ToLower())).ToList();
             }
-            var allUsers = usersOne.Concat(usersTwo).Concat(usersThree).Concat(usersFour).ToList();
+            var allUsers = usersOne.Union(usersTwo).Union(usersThree).Union(usersFour).ToList();
             var finalUsers = new List<SearchUserDto>();
             if (allUsers.Count() == 0)
             {
@@ -195,6 +195,7 @@
                     };
                     finalUsers.Add(usTemp);
                 }
+                finalUsers.OrderBy(x => x.FirstLastName);
                 return Ok(finalUsers);
             }
         }
