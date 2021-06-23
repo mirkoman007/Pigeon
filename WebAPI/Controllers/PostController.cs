@@ -138,6 +138,29 @@
             }
         }
 
+
+        /// <summary>
+        /// Gets all comments from specified post id.
+        /// </summary>
+        [HttpGet("comment/{postID}")]
+        public async Task<ActionResult<IEnumerable<CommentDto>>> GetPostAllComments([FromRoute] int postID)
+        {
+            if(_context.Posts.Find(postID) == null)
+            {
+                return BadRequest("Post with this id does not exist");
+            }
+
+            var comments = _context.Comments.Include(x => x.User).Where(x => x.PostId == postID);
+            if (comments != null)
+            {
+                return await Task.FromResult(Ok(_mapper.Map<List<CommentDto>>(comments)));
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         /// <summary>
         /// Creates post (groupId should be null for normal user posts | Posts made inside group should have group id)
         /// </summary>

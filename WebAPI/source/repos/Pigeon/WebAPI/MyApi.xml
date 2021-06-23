@@ -78,6 +78,28 @@
             <param name="userTwoId">The userTwoId<see cref="T:System.Int32"/>.</param>
             <returns>.</returns>
         </member>
+        <member name="F:WebAPI.Controllers.GroupController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.GroupController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.UsersController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.CreateGroup(WebAPI.Models.Command.CreateGroupCommand)">
+            <summary>
+            Creates a new group (WORK IN PROGRESS, need to somehow connect users to group)
+            </summary>
+        </member>
         <member name="T:WebAPI.Controllers.PostController">
             <summary>
             Defines the <see cref="T:WebAPI.Controllers.PostController" />.
@@ -121,6 +143,11 @@
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
             <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;PostDto&gt;&gt;&gt;"/>.</returns>
         </member>
+        <member name="M:WebAPI.Controllers.PostController.GetPostAllComments(System.Int32)">
+            <summary>
+            Gets all comments from specified post id.
+            </summary>
+        </member>
         <member name="M:WebAPI.Controllers.PostController.CreatePost(WebAPI.Models.Command.CreatePostCommand)">
             <summary>
             Creates post (groupId should be null for normal user posts | Posts made inside group should have group id)
@@ -152,7 +179,6 @@
             </summary>
             <param name="postID">The postID<see cref="T:System.Int32"/>.</param>
             <param name="commentID">The commentID<see cref="T:System.Int32"/>.</param>
-            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateCommentCommand"/>.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
         </member>
         <member name="M:WebAPI.Controllers.PostController.AddPostReaction(System.Int32,System.Int32,System.String)">
