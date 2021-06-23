@@ -128,6 +128,33 @@
             <param name="model">The model<see cref="T:WebAPI.Models.Command.CreatePostCommand"/>.</param>
             <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
         </member>
+        <member name="M:WebAPI.Controllers.PostController.CreateComment(WebAPI.Models.Command.CreateCommentCommand,System.Int32)">
+            <summary>
+            Creates comment(commentId property inside request body is used for commenting a comment(not sure if this will be implemented so
+            it should probably be null))
+            </summary>
+            <param name="postID">The postID<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.CreateCommentCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.UpdateComment(WebAPI.Models.Command.UpdateCommentCommand,System.Int32,System.Int32)">
+            <summary>
+            Update comment
+            </summary>
+            <param name="postID">The postID<see cref="T:System.Int32"/>.</param>
+            <param name="commentID">The commentID<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateCommentCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.DeleteComment(System.Int32,System.Int32)">
+            <summary>
+            Delete comment
+            </summary>
+            <param name="postID">The postID<see cref="T:System.Int32"/>.</param>
+            <param name="commentID">The commentID<see cref="T:System.Int32"/>.</param>
+            <param name="model">The model<see cref="T:WebAPI.Models.Command.UpdateCommentCommand"/>.</param>
+            <returns>The <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/>.</returns>
+        </member>
         <member name="M:WebAPI.Controllers.PostController.AddPostReaction(System.Int32,System.Int32,System.String)">
             <summary>
             Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)

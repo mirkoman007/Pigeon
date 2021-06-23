@@ -11,6 +11,8 @@ namespace WebAPI.Profiles
         public PostProfile()
         {
             CreateMap<CreatePostCommand, Post>();
+            CreateMap<CreateCommentCommand, Comment>();
+            CreateMap<UpdateCommentCommand, Comment>();
             CreateMap<Post, PostDto>()
                 .ForMember(x=>x.UserFirstLastName, opt => opt.MapFrom(y => y.User.FirstName + " " + y.User.LastName));
             CreateMap<List<Post>, List<PostDto>>();

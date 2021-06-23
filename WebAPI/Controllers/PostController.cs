@@ -186,6 +186,127 @@
         }
 
         /// <summary>
+        /// Creates comment(commentId property inside request body is used for commenting a comment(not sure if this will be implemented so
+        /// it should probably be null))
+        /// </summary>
+        /// <param name="postID">The postID<see cref="int"/>.</param>
+        /// <param name="model">The model<see cref="CreateCommentCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
+        [HttpPost("comment/{postID}")]
+        public IActionResult CreateComment([FromBody] CreateCommentCommand model, [FromRoute] int postID)
+        {
+            if (model.UserId == null)
+            {
+                return BadRequest("UserId property cannot be null");
+            }
+            if (model.Text == null)
+            {
+                return BadRequest("Text property cannot be null");
+            }
+            if (_context.Comments.Find(model.CommentId) == null && model.CommentId != 0)
+            {
+                return BadRequest("Comment with this commentId property does not exist");
+            }
+            var comment = new Comment();
+
+
+            comment = _mapper.Map<Comment>(model);
+            comment.CommentId = null;
+            if (model.CommentId != 0)
+            {
+                comment.CommentId = model.CommentId;
+            }
+            comment.DateTime = DateTime.Now;
+            comment.PostId = postID;
+            if(_context.Posts.Find(postID) == null)
+            {
+                return BadRequest("Post with this id does not exist");
+            }
+            if (_context.Users.Find(model.UserId) == null)
+            {
+                return BadRequest("User with this id does not exist");
+            }
+
+            try
+            {
+                _context.Comments.Add(comment);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Update comment
+        /// </summary>
+        /// <param name="postID">The postID<see cref="int"/>.</param>
+        /// <param name="commentID">The commentID<see cref="int"/>.</param>
+        /// <param name="model">The model<see cref="UpdateCommentCommand"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
+        [HttpPut("comment/{postID}/{commentID}")]
+        public IActionResult UpdateComment([FromBody] UpdateCommentCommand model, [FromRoute] int postID, [FromRoute] int commentID)
+        {
+            if (_context.Posts.Find(postID) == null)
+            {
+                return BadRequest("Post with this id does not exist");
+            }
+            if (model.Text == null)
+            {
+                return BadRequest("Text property cannot be null");
+            }
+
+            var comment = _context.Comments.Find(commentID);
+            if(comment == null)
+            {
+                return BadRequest("Comment with this commentId does not exist");
+            }
+            try
+            {
+                comment.Text = model.Text;
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Delete comment
+        /// </summary>
+        /// <param name="postID">The postID<see cref="int"/>.</param>
+        /// <param name="commentID">The commentID<see cref="int"/>.</param>
+        /// <returns>The <see cref="IActionResult"/>.</returns>
+        [HttpDelete("comment/{postID}/{commentID}")]
+        public IActionResult DeleteComment([FromRoute] int postID, [FromRoute] int commentID)
+        {
+            if (_context.Posts.Find(postID) == null)
+            {
+                return BadRequest("Post with this id does not exist");
+            }
+
+            var comment = _context.Comments.Find(commentID);
+            if (comment == null)
+            {
+                return BadRequest("Comment with this commentId does not exist");
+            }
+            try
+            {
+                _context.Comments.Remove(comment);
+                _context.SaveChanges();
+                return Ok();
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
         /// </summary>
         [HttpPost("reaction/{postId}/{userId}/{reactionName}")]
