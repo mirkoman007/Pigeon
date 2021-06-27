@@ -174,7 +174,7 @@
                 return BadRequest("UserId property cannot be null");
             }
             var post = _mapper.Map<Post>(model);
-            post.DateTime = DateTime.Now;
+            post.DateTime = DateTime.Now.AddHours(2);
             if (!string.IsNullOrEmpty(model.MediaPath))
             {
                 var mediaCheck = _context.Media.SingleOrDefaultAsync(p => p.MediaPath == model.MediaPath);
@@ -239,7 +239,7 @@
             {
                 comment.CommentId = model.CommentId;
             }
-            comment.DateTime = DateTime.Now;
+            comment.DateTime = DateTime.Now.AddHours(2);
             comment.PostId = postID;
             if(_context.Posts.Find(postID) == null)
             {
@@ -488,7 +488,7 @@
                     }
                 }
             }
-            post.DateTime = DateTime.Now;
+            post.DateTime = DateTime.Now.AddHours(2);
             try
             {
                 _context.Posts.Update(post);

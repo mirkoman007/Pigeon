@@ -46,7 +46,7 @@ namespace WebAPI.Controllers
                 return BadRequest("Name property cannot be null");
             }
             var group = _mapper.Map<Group>(model);
-            group.DateTime = DateTime.Now;
+            group.DateTime = DateTime.Now.AddHours(2);
 
             try
             {

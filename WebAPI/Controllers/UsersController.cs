@@ -340,7 +340,7 @@
                 LastName = model.LastName,
                 Email = model.Email,
                 Birthday = model.Birthday,
-                CreateDateTime = DateTime.Now,
+                CreateDateTime = DateTime.Now.AddHours(2),
                 UserTypeId = 2,
                 Verification = false
             };

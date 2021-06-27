@@ -41,9 +41,30 @@
             <param name="id">User id.</param>
             <returns>.</returns>
         </member>
+        <member name="M:WebAPI.Controllers.FriendsController.GetReceiveFriendRequestForUserID(System.Int32)">
+            <summary>
+            Gets only receiving friend requests for provided user id.
+            </summary>
+            <param name="id">User id.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.GetSentFriendRequestForUserID(System.Int32)">
+            <summary>
+            Gets only friend requests that were sent by provided user id towards other users.
+            </summary>
+            <param name="id">User id.</param>
+            <returns>.</returns>
+        </member>
         <member name="M:WebAPI.Controllers.FriendsController.GetAllFriendsForUserID(System.Int32)">
             <summary>
             Gets list of all friends for given user id.
+            </summary>
+            <param name="id">User id.</param>
+            <returns>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.FriendsController.GetAllNonFriendsForUserID(System.Int32)">
+            <summary>
+            Gets list of all non-friends for given user id.
             </summary>
             <param name="id">User id.</param>
             <returns>.</returns>

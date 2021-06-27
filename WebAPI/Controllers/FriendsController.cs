@@ -50,7 +50,7 @@
         [HttpPost("request/send/{userRequestID}/{userRespondID}")]
         public async Task<IActionResult> SendFriendRequest([FromRoute] int userRequestID, [FromRoute] int userRespondID)
         {
-            if((_context.Friends.Where(x => x.UserRequestId == userRequestID).Any() && _context.Friends.Where(x=>x.UserResponderId == userRespondID).Any())
+            if ((_context.Friends.Where(x => x.UserRequestId == userRequestID).Any() && _context.Friends.Where(x => x.UserResponderId == userRespondID).Any())
                 || (_context.Friends.Where(x => x.UserRequestId == userRespondID).Any() && _context.Friends.Where(x => x.UserResponderId == userRequestID).Any()))
             {
                 return BadRequest("These users are already friends!");
@@ -74,7 +74,7 @@
             {
                 UserRequestId = userRequestID,
                 UserResponderId = userRespondID,
-                DateTime = DateTime.Now
+                DateTime = DateTime.Now.AddHours(2)
             };
 
             var addedFriendRequest = _context.FriendRequests.Add(friendRequest);
@@ -87,8 +87,41 @@
         /// </summary>
         /// <param name="id">User id.</param>
         /// <returns>.</returns>
-        [HttpGet("request/{id}")]
+        [HttpGet("request/all/{id}")]
         public async Task<ActionResult<List<FriendRequestDto>>> GetAllFriendRequestForUserID([FromRoute] int id)
+        {
+            if (_context.Users.Find(id) == null)
+            {
+                return BadRequest("User with provided Id does not exist");
+            }
+            List<FriendRequest> friendRequests = await _context.FriendRequests.ToListAsync();
+            List<FriendRequestDto> friendRequestsDto = new List<FriendRequestDto>();
+            foreach (var friendRequest in friendRequests)
+            {
+                if (id == friendRequest.UserResponderId || id == friendRequest.UserRequestId)
+                {
+                    friendRequestsDto.Add(new FriendRequestDto
+                    {
+                        IdfriendRequest = friendRequest.IdfriendRequest,
+                        DateTime = friendRequest.DateTime,
+                        UserRequestId = friendRequest.UserRequestId,
+                        UserRequestName = _context.Users.Find(friendRequest.UserRequestId).FirstName + ' ' + _context.Users.Find(friendRequest.UserRequestId).LastName,
+                        UserResponderId = friendRequest.UserResponderId,
+                        UserResponderName = _context.Users.Find(friendRequest.UserResponderId).FirstName + ' ' + _context.Users.Find(friendRequest.UserResponderId).LastName,
+                    });
+                }
+            }
+            return await Task.FromResult(Ok(friendRequestsDto));
+        }
+
+
+        /// <summary>
+        /// Gets only receiving friend requests for provided user id.
+        /// </summary>
+        /// <param name="id">User id.</param>
+        /// <returns>.</returns>
+        [HttpGet("request/received/{id}")]
+        public async Task<ActionResult<List<FriendRequestDto>>> GetReceiveFriendRequestForUserID([FromRoute] int id)
         {
             if (_context.Users.Find(id) == null)
             {
@@ -105,7 +138,41 @@
                         IdfriendRequest = friendRequest.IdfriendRequest,
                         DateTime = friendRequest.DateTime,
                         UserRequestId = friendRequest.UserRequestId,
-                        UserResponderId = friendRequest.UserResponderId
+                        UserRequestName = _context.Users.Find(friendRequest.UserRequestId).FirstName + ' ' + _context.Users.Find(friendRequest.UserRequestId).LastName,
+                        UserResponderId = friendRequest.UserResponderId,
+                        UserResponderName = _context.Users.Find(friendRequest.UserResponderId).FirstName + ' ' + _context.Users.Find(friendRequest.UserResponderId).LastName,
+                    });
+                }
+            }
+            return await Task.FromResult(Ok(friendRequestsDto));
+        }
+
+        /// <summary>
+        /// Gets only friend requests that were sent by provided user id towards other users.
+        /// </summary>
+        /// <param name="id">User id.</param>
+        /// <returns>.</returns>
+        [HttpGet("request/sent/{id}")]
+        public async Task<ActionResult<List<FriendRequestDto>>> GetSentFriendRequestForUserID([FromRoute] int id)
+        {
+            if (_context.Users.Find(id) == null)
+            {
+                return BadRequest("User with provided Id does not exist");
+            }
+            List<FriendRequest> friendRequests = await _context.FriendRequests.ToListAsync();
+            List<FriendRequestDto> friendRequestsDto = new List<FriendRequestDto>();
+            foreach (var friendRequest in friendRequests)
+            {
+                if (id == friendRequest.UserRequestId)
+                {
+                    friendRequestsDto.Add(new FriendRequestDto
+                    {
+                        IdfriendRequest = friendRequest.IdfriendRequest,
+                        DateTime = friendRequest.DateTime,
+                        UserRequestId = friendRequest.UserRequestId,
+                        UserRequestName = _context.Users.Find(friendRequest.UserRequestId).FirstName + ' ' + _context.Users.Find(friendRequest.UserRequestId).LastName,
+                        UserResponderId = friendRequest.UserResponderId,
+                        UserResponderName = _context.Users.Find(friendRequest.UserResponderId).FirstName + ' ' + _context.Users.Find(friendRequest.UserResponderId).LastName,
                     });
                 }
             }
@@ -119,11 +186,11 @@
         /// <param name="id">User id.</param>
         /// <returns>.</returns>
         [HttpGet("all/{id}")]
-        public async Task<ActionResult<List<FriendRequestDto>>> GetAllFriendsForUserID([FromRoute] int id)
+        public async Task<ActionResult<List<FriendDto>>> GetAllFriendsForUserID([FromRoute] int id)
         {
             var FriendListMain = _context.Friends.Include(x => x.UserResponder).Include(x => x.UserRequest).Where(x => x.UserRequestId == id).ToList();
             var FriendListSecondary = _context.Friends.Include(x => x.UserResponder).Include(x => x.UserRequest).Where(x => x.UserResponderId == id).ToList();
-            var FriendList = FriendListMain.Concat(FriendListSecondary).ToList();
+            var FriendList = FriendListMain.Union(FriendListSecondary).ToList();
 
             var Friends = new List<FriendDto>();
             foreach (var user in FriendList)
@@ -133,7 +200,7 @@
                     var friendTemp = new FriendDto
                     {
                         FirstLastName = user.UserResponder.FirstName + " " + user.UserResponder.LastName,
-                        FriendId = (int)user.UserResponderId
+                        UserId = (int)user.UserResponderId
                     };
                     Friends.Add(friendTemp);
                 }
@@ -142,12 +209,68 @@
                     var friendTemp = new FriendDto
                     {
                         FirstLastName = user.UserRequest.FirstName + " " + user.UserRequest.LastName,
-                        FriendId = (int)user.UserRequestId
+                        UserId = (int)user.UserRequestId
                     };
                     Friends.Add(friendTemp);
                 }
             }
-            return await Task.FromResult(Ok(Friends));
+            return await Task.FromResult(Ok(Friends.OrderBy(x => x.FirstLastName)));
+        }
+
+        /// <summary>
+        /// Gets list of all non-friends for given user id.
+        /// </summary>
+        /// <param name="id">User id.</param>
+        /// <returns>.</returns>
+        [HttpGet("non/{id}")]
+        public async Task<ActionResult<List<FriendDto>>> GetAllNonFriendsForUserID([FromRoute] int id)
+        {
+            var FriendListMain = _context.Friends.Include(x => x.UserResponder).Include(x => x.UserRequest).Where(x => x.UserRequestId == id).ToList();
+            var FriendListSecondary = _context.Friends.Include(x => x.UserResponder).Include(x => x.UserRequest).Where(x => x.UserResponderId == id).ToList();
+            var FriendList = FriendListMain.Union(FriendListSecondary).ToList();
+            var allUsers = _context.Users.ToList();
+
+            var Friends = new List<FriendDto>();
+            foreach (var user in FriendList)
+            {
+                if (user.UserRequestId == id)
+                {
+                    var friendTemp = new FriendDto
+                    {
+                        FirstLastName = user.UserResponder.FirstName + " " + user.UserResponder.LastName,
+                        UserId = (int)user.UserResponderId
+                    };
+                    Friends.Add(friendTemp);
+                }
+                if (user.UserResponderId == id)
+                {
+                    var friendTemp = new FriendDto
+                    {
+                        FirstLastName = user.UserRequest.FirstName + " " + user.UserRequest.LastName,
+                        UserId = (int)user.UserRequestId
+                    };
+                    Friends.Add(friendTemp);
+                }
+            }
+
+            var NonFriends = new List<FriendDto>();
+            foreach (var user in allUsers)
+            {
+                var friendTemp = new FriendDto
+                {
+                    FirstLastName = user.FirstName + ' ' + user.LastName,
+                    UserId = user.Iduser
+                };
+                NonFriends.Add(friendTemp);
+            }
+
+            foreach (var item in Friends)
+            {
+                NonFriends.RemoveAll((x) => x.UserId == item.UserId);
+            }
+            NonFriends.RemoveAll((x) => x.UserId == id);
+            var result = NonFriends.OrderBy(x => x.FirstLastName);
+            return await Task.FromResult(Ok(result));
         }
 
         /// <summary>
@@ -165,12 +288,13 @@
             }
             var friend = new Friend
             {
-                DateTime = DateTime.Now,
+                DateTime = DateTime.Now.AddHours(2),
                 UserRequestId = friendRequest.UserRequestId,
                 UserResponderId = friendRequest.UserResponderId
             };
             try
             {
+                _context.FriendRequests.Remove(friendRequest);
                 await _context.Friends.AddAsync(friend);
                 await _context.SaveChangesAsync();
             }
@@ -213,11 +337,11 @@
             {
                 return BadRequest("Friend request with provided Ids does not exist");
             }
-            if(friendRequestOne.IdfriendRequest != 0)
+            if (friendRequestOne.IdfriendRequest != 0)
             {
                 var friend = new Friend
                 {
-                    DateTime = DateTime.Now,
+                    DateTime = DateTime.Now.AddHours(2),
                     UserRequestId = friendRequestOne.UserRequestId,
                     UserResponderId = friendRequestOne.UserResponderId
                 };
@@ -238,7 +362,7 @@
             {
                 var friend = new Friend
                 {
-                    DateTime = DateTime.Now,
+                    DateTime = DateTime.Now.AddHours(2),
                     UserRequestId = friendRequestTwo.UserRequestId,
                     UserResponderId = friendRequestTwo.UserResponderId
                 };

@@ -4,6 +4,6 @@
     {
         public string FirstLastName { get; set; }
 
-        public int FriendId { get; set; }
+        public int UserId { get; set; }
     }
 }
