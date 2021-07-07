@@ -1,0 +1,79 @@
+﻿@page "/search"
+@page "/search/{SearchString}"
+@attribute [Authorize]
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+
+
+
+
+<div class="card mt-4">
+    <h4 class="card-header">People</h4>
+    <div class="card-body">
+        @if (peoples == null)
+        {
+            <div class="spinner-border spinner-border-sm"></div>
+        }
+        else
+        {
+            <ul>
+                @if (peoples.Count != 0)
+                {
+                    @foreach (var people in peoples)
+                    {
+                        <li>@people.IdUser @people.FirstLastName @people.City</li>
+                    }
+                }
+                else
+                {
+                    <li>"No result"</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<div class="card mt-4">
+    <h4 class="card-header">Groups</h4>
+    <div class="card-body">
+        <ul>
+            <li>"No result"</li>
+        </ul>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string SearchString { get; set; }
+
+    IList<SearchUser> peoples;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (SearchString == null)
+        {
+            SearchString = "";
+        }
+
+        try
+        {
+            peoples = await UserService.Search(SearchString);
+        }
+        catch
+        {
+            peoples = new List<SearchUser>();
+        }
+    }
+
+    protected override async void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+
+}

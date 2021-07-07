@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
 
 
 <div class="page">
@@ -10,8 +11,17 @@
     <div class="main">
         @if (AuthenticationService.User != null)
         {
+
             <div class="top-row px-4">
-                <NavLink href="logout" class="ml-md-auto btn btn-danger"><span class="oi oi-account-logout" aria-hidden="true"/> Logout</NavLink>
+                <EditForm Model="@model" OnSubmit="StartSearching">
+                    <div class="input-group">
+                        <InputText @bind-Value="model.SearchString" class="form-control" placeholder="Search Pigeon" />
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-secondary"><span class="oi oi-magnifying-glass" aria-hidden="true" /></button>
+                        </div>
+                    </div>
+                </EditForm>
+                <NavLink href="logout" class="ml-md-auto btn btn-danger"><span class="oi oi-account-logout" aria-hidden="true" /> Logout</NavLink>
             </div>
         }
 
@@ -20,3 +30,18 @@
         </div>
     </div>
 </div>
+
+@code{
+    private Model model = new Model();
+
+    private void StartSearching()
+    {
+        NavigationManager.NavigateTo($"search/{model.SearchString}");
+        Console.WriteLine("test");
+    }
+
+    private class Model
+    {
+        public string SearchString { get; set; }
+    }
+}
