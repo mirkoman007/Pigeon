@@ -8,14 +8,39 @@
 @inject NavigationManager NavigationManager
 
 
-@if (user != null) { 
-<h3>@user.FirstName @user.LastName</h3>
+@if (user != null)
+{
+    <h3>@user.FirstName @user.LastName</h3>
+}
+
+@if (!yourProfile && friendsLoaded)
+{
+
+    @if (IsYourFriend())
+    {
+        <button type="button" class="btn btn-outline-primary"><span class="oi oi-inbox" aria-hidden="true" /> Send message</button>
+    }
+    else
+    {
+        @if (FriendRequestSent())
+        {
+            <button type="button" class="btn btn-outline-danger" @onclick="CancelFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Cancel friend request</button>
+        }
+        else if(FriendRequestReceived())
+        {
+            <button type="button" class="btn btn-success" @onclick="AcceptFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Accept friend request</button>
+            <button type="button" class="btn btn-outline-danger" @onclick="DeclineFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Decline friend request</button>
+        }
+        else
+        {
+            <button type="button" class="btn btn-primary" @onclick="SendFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Send friend request</button>
+        }
+
+    }
 }
 
 
 <div class="row">
-
-
 
     <div class="col-md-4">
         <div class="card mb-3">
@@ -35,19 +60,19 @@
             <div class="card-body">
                 <h5 class="card-title"><span class="oi oi-people" aria-hidden="true" /> Friends</h5>
                 <ul class="list-group list-group-flush">
-                    @if (friends != null && friends.Count == 0)
+                    @if (profileFriends != null && profileFriends.Count == 0)
                     {
                         <li class="list-group-item">You currently have no friends</li>
                     }
-                    else if (friends != null)
+                    else if (profileFriends != null)
                     {
                         int size = 6;
-                        if (friends.Count < size)
-                            size = friends.Count;
+                        if (profileFriends.Count < size)
+                            size = profileFriends.Count;
                         @for (int i = 0; i < size; i++)
                         {
 
-                            <li class="list-group-item"><a href="/profile/@friends[i].UserId">@friends[i].FirstLastName</a></li>
+                            <li class="list-group-item"><a href="/profile/@profileFriends[i].UserId">@profileFriends[i].FirstLastName</a></li>
                         }
                     }
                 </ul>
@@ -124,8 +149,12 @@
     private bool yourProfile;
     private bool postsLoading;
     private bool postBtnLoading;
+    private bool friendsLoaded;
     private IList<Post> posts;
-    private IList<Friend> friends;
+    private IList<Friend> profileFriends;
+    private IList<Friend> yourFriends;
+    private IList<FriendRequest> friendRequestSent;
+    private IList<FriendRequest> friendRequestReceived;
     private User user;
     private AddPost model = new AddPost();
     private string error;
@@ -134,7 +163,7 @@
     protected override async Task OnInitializedAsync()
     {
         yourProfile = false;
-        if (UserID == 0 || UserID== AuthenticationService.User.IdUser)
+        if (UserID == 0 || UserID == AuthenticationService.User.IdUser)
         {
             yourProfile = true;
             UserID = AuthenticationService.User.IdUser;
@@ -176,7 +205,12 @@
 
     async Task LoadFriends()
     {
-        friends = await FriendService.GetAllFriends(UserID);
+        friendsLoaded = false;
+        profileFriends = await FriendService.GetAllFriends(UserID);
+        yourFriends = await FriendService.GetAllFriends(AuthenticationService.User.IdUser);
+        friendRequestSent = await FriendService.GetFriendRequestSent(AuthenticationService.User.IdUser);
+        friendRequestReceived = await FriendService.GetFriendRequestReceived(AuthenticationService.User.IdUser);
+        friendsLoaded = true;
     }
 
     async Task LoadProfileInfo()
@@ -191,6 +225,104 @@
 
         await OnInitializedAsync();
         StateHasChanged();
+    }
+
+    private bool IsYourFriend()
+    {
+        //yourFriends.Where(f => f.UserId == UserID);
+
+        foreach (var i in yourFriends)
+        {
+            if (i.UserId == UserID)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool FriendRequestSent()
+    {
+        foreach(var i in friendRequestSent)
+        {
+            if (i.UserResponderId == UserID)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool FriendRequestReceived()
+    {
+        foreach(var i in friendRequestReceived)
+        {
+            if (i.UserRequestId == UserID)
+                return true;
+        }
+
+        return false;
+    }
+
+    private async void AcceptFriendRequest()
+    {
+        try
+        {
+            await FriendService.AcceptFriendRequest(UserID, AuthenticationService.User.IdUser);
+            await LoadFriends();
+            StateHasChanged();
+        }
+        catch
+        {
+
+            await LoadFriends();
+            StateHasChanged();
+        }
+    }
+
+    private async void DeclineFriendRequest()
+    {
+        try
+        {
+            await FriendService.DeclineFriendRequest(UserID,AuthenticationService.User.IdUser);
+            await LoadFriends();
+            StateHasChanged();
+        }
+        catch
+        {
+
+            await LoadFriends();
+            StateHasChanged();
+        }
+
+    }
+
+    private async void CancelFriendRequest()
+    {
+        try
+        {
+            await FriendService.DeclineFriendRequest(AuthenticationService.User.IdUser, UserID);
+            await LoadFriends();
+            StateHasChanged();
+        }
+        catch
+        {
+
+            await LoadFriends();
+            StateHasChanged();
+        }
+    }
+
+    private async void SendFriendRequest()
+    {
+        try
+        {
+            await FriendService.SendFriendRequest(AuthenticationService.User.IdUser, UserID);
+            await LoadFriends();
+            StateHasChanged();
+        }
+        catch
+        {
+
+        }
     }
 
 }
