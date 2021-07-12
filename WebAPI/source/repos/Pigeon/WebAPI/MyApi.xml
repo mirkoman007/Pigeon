@@ -84,6 +84,14 @@
             <param name="userTwoId">The userTwoId<see cref="T:System.Int32"/>.</param>
             <returns>.</returns>
         </member>
+        <member name="M:WebAPI.Controllers.FriendsController.RemoveFriendsBasedOnIds(System.Int32,System.Int32)">
+            <summary>
+            Removes friendship between two users
+            </summary>
+            <param name="userOneId">The userOneId<see cref="T:System.Int32"/>.</param>
+            <param name="userTwoId">The userTwoId<see cref="T:System.Int32"/>.</param>
+            <returns>.</returns>
+        </member>
         <member name="M:WebAPI.Controllers.FriendsController.DeclineFriendRequest(System.Int32)">
             <summary>
             Decline friend request based on friend request id.
