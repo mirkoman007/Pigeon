@@ -1,43 +1,84 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Pigeon</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+﻿@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <NavLink class="navbar-brand" href="">Pigeon</NavLink>
+    <EditForm Model="@model" OnSubmit="StartSearching">
+        <div class="input-group">
+            <InputText @bind-Value="model.SearchString" class="form-control" placeholder="Search Pigeon" />
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary"><span class="oi oi-magnifying-glass" aria-hidden="true" /></button>
+            </div>
+        </div>
+    </EditForm>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-</div>
+    <div class="collapse navbar-collapse @NavMenuCssClass" id="navbarNavDropdown">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="oi oi-home" aria-hidden="true" /> Home
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="users">
+                    <span class="oi oi-people" aria-hidden="true" /> Users
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="counter">
+                    <span />
+                    <span class="oi oi-plus" aria-hidden="true" /> Counter
+                </NavLink>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-md-auto">
+            <li class="nav-item dropdown @DropDownCssClass">
+                <NavLink class="nav-link dropdown-toggle" @onclick="ToggleDropDown" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@AuthenticationService.User.FirstName</NavLink>
+                <div class="dropdown-menu dropdown-menu-md-right @DropDownCssClass" aria-labelledby="navbarDropdownMenuLink">
+                    <NavLink class="dropdown-item" href="profile"><span class="oi oi-person" aria-hidden="true" /> My profile</NavLink>
+                    <NavLink class="dropdown-item" href="logout"><span class="oi oi-account-logout" aria-hidden="true" /> Logout</NavLink>
+                </div>
+            </li>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"/> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="profile">
-                <span class="oi oi-person" aria-hidden="true"/> Profile
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="users">
-                <span class="oi oi-people" aria-hidden="true"/> Users
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span />
-                <span class="oi oi-plus" aria-hidden="true"/> Counter
-            </NavLink>
-        </li>
-    </ul>
-</div>
+        </ul>
+    </div>
+</nav>
 
 @code {
-    private bool collapseNavMenu = true;
+    private bool collapseDropDown;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string DropDownCssClass => collapseDropDown ? "show" : null;
+
+    private void ToggleDropDown()
+    {
+        collapseDropDown = !collapseDropDown;
+    }
+
+    //===========================================================================
+
+    private bool collapseNavMenu;
+
+    private string NavMenuCssClass => collapseNavMenu ? "show" : null;
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    //===========================================================================
+
+    private Model model = new Model();
+
+    private void StartSearching()
+    {
+        NavigationManager.NavigateTo($"search/{model.SearchString}");
+        Console.WriteLine("test");
+    }
+
+    private class Model
+    {
+        public string SearchString { get; set; }
     }
 }
