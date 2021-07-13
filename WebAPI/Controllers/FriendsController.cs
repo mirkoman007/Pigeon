@@ -50,8 +50,8 @@
         [HttpPost("request/send/{userRequestID}/{userRespondID}")]
         public async Task<IActionResult> SendFriendRequest([FromRoute] int userRequestID, [FromRoute] int userRespondID)
         {
-            if ((_context.Friends.Where(x => x.UserRequestId == userRequestID).Any() && _context.Friends.Where(x => x.UserResponderId == userRespondID).Any())
-                || (_context.Friends.Where(x => x.UserRequestId == userRespondID).Any() && _context.Friends.Where(x => x.UserResponderId == userRequestID).Any()))
+            if ((_context.Friends.Where(x => x.UserRequestId == userRequestID).Where(x => x.UserResponderId == userRespondID).Any())
+                || (_context.Friends.Where(x => x.UserRequestId == userRespondID).Where(x => x.UserResponderId == userRequestID).Any()))
             {
                 return BadRequest("These users are already friends!");
             }
@@ -64,8 +64,8 @@
             {
                 return BadRequest("User for this respond Id does not exist");
             };
-            if (((_context.FriendRequests.Where(x => x.UserRequestId == userRequestID).Any()) && (_context.FriendRequests.Where(x => x.UserResponderId == userRespondID).Any())) ||
-                ((_context.FriendRequests.Where(x => x.UserRequestId == userRespondID).Any()) && (_context.FriendRequests.Where(x => x.UserResponderId == userRequestID).Any())))
+            if (((_context.FriendRequests.Where(x => x.UserRequestId == userRequestID).Where(x => x.UserResponderId == userRespondID).Any())) ||
+                ((_context.FriendRequests.Where(x => x.UserRequestId == userRespondID).Where(x => x.UserResponderId == userRequestID).Any())))
             {
                 return BadRequest("Friend request for these users already exist!");
             };
@@ -81,6 +81,7 @@
             await _context.SaveChangesAsync();
             return Ok();
         }
+
 
         /// <summary>
         /// Gets all friend requests for given user id.
@@ -381,6 +382,63 @@
 
             return await Task.FromResult(Ok("Friends added successfully!"));
         }
+
+
+        /// <summary>
+        /// Removes friendship between two users
+        /// </summary>
+        /// <param name="userOneId">The userOneId<see cref="int"/>.</param>
+        /// <param name="userTwoId">The userTwoId<see cref="int"/>.</param>
+        /// <returns>.</returns>
+        [HttpDelete("remove/{userOneId}/{userTwoId}")]
+        public async Task<IActionResult> RemoveFriendsBasedOnIds([FromRoute] int userOneId, [FromRoute] int userTwoId)
+        {
+            if (_context.Users.Find(userOneId) == null)
+            {
+                return BadRequest("User for this userOneId does not exist");
+            };
+            if (_context.Users.Find(userTwoId) == null)
+            {
+                return BadRequest("User for this userTwoId does not exist");
+            };
+
+            var friendsCheckOne = new Friend();
+            var friendsCheckTwo = new Friend();
+
+            try
+            {
+                friendsCheckOne = await _context.Friends.Where(x => x.UserRequestId == userOneId).Where(x => x.UserResponderId == userTwoId).FirstAsync();
+            }
+            catch (Exception)
+            {
+                friendsCheckOne = null;
+            }
+            try
+            {
+                friendsCheckTwo = await _context.Friends.Where(x => x.UserRequestId == userTwoId).Where(x => x.UserResponderId == userOneId).FirstAsync();
+            }
+            catch (Exception)
+            {
+                friendsCheckTwo = null;
+            }
+
+            if(friendsCheckOne != null)
+            {
+                _context.Friends.Remove(friendsCheckOne);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            if(friendsCheckTwo != null)
+            {
+                _context.Friends.Remove(friendsCheckTwo);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+
+            return BadRequest("Error happened while trying to remove friends");
+
+        }
+
 
         /// <summary>
         /// Decline friend request based on friend request id.
