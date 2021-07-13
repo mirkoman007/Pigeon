@@ -19,6 +19,7 @@
     @if (IsYourFriend())
     {
         <button type="button" class="btn btn-outline-primary"><span class="oi oi-inbox" aria-hidden="true" /> Send message</button>
+        <button type="button" class="btn btn-outline-danger" @onclick="Unfriend"><span class="oi oi-circle-x" aria-hidden="true" /> Unfriend</button>
     }
     else
     {
@@ -316,6 +317,20 @@
         try
         {
             await FriendService.SendFriendRequest(AuthenticationService.User.IdUser, UserID);
+            await LoadFriends();
+            StateHasChanged();
+        }
+        catch
+        {
+
+        }
+    }
+
+    private async void Unfriend()
+    {
+        try
+        {
+            await FriendService.Unfriend(AuthenticationService.User.IdUser, UserID);
             await LoadFriends();
             StateHasChanged();
         }

@@ -126,7 +126,14 @@
     async Task LoadPosts()
     {
         postsLoading = true;
-        posts = await PostService.GetFriendsUserPost(AuthenticationService.User.IdUser);
+        try
+        {
+            posts = await PostService.GetFriendsUserPost(AuthenticationService.User.IdUser);
+        }
+        catch
+        {
+            posts = new List<Post>();
+        }
         postsLoading = false;
     }
 

@@ -14,6 +14,7 @@ namespace WebApplication.Services
         Task<IList<Friend>> GetAllFriends(int id);
         Task<String> AcceptFriendRequest(int userRequestID, int userRespondID);
         Task<String> DeclineFriendRequest(int userRequestID, int userRespondID);
+        Task Unfriend(int userRequestID, int userRespondID);
 
     }
 
@@ -54,6 +55,10 @@ namespace WebApplication.Services
         public async Task<String> DeclineFriendRequest(int userRequestID, int userRespondID)
         {
             return await _httpService.Get<String>($"/api/Friends/decline/{userRequestID}/{userRespondID}");
+        }
+        public async Task Unfriend(int userRequestID, int userRespondID)
+        {
+            await _httpService.Delete($"/api/Friends/remove/{userRequestID}/{userRespondID}");
         }
     }
 }
