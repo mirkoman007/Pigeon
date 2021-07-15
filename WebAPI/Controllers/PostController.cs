@@ -141,6 +141,30 @@
             }
         }
 
+        /// <summary>
+        /// Gets all posts from specified group.
+        /// </summary>
+        /// <param name="id">The id<see cref="int"/>.</param>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{PostDto}}}"/>.</returns>
+        [HttpGet("group/{id:int}")]
+        public async Task<ActionResult<IEnumerable<PostDto>>> GetGroupAllPosts([FromRoute] int id)
+        {
+            var group = _context.Groups.Find(id);
+            if (group == null)
+            {
+                return NotFound("Could not find group with this id");
+            }
+            var posts = _context.Posts.Include(x => x.User).Where(x => x.GroupId == id);
+            if (posts != null)
+            {
+                return await Task.FromResult(Ok(_mapper.Map<List<PostDto>>(posts)));
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
 
         /// <summary>
         /// Gets all comments from specified post id.
@@ -175,6 +199,11 @@
             if (model.UserId == null)
             {
                 return BadRequest("UserId property cannot be null");
+            }
+            var group = _context.Groups.Find(model.GroupId);
+            if (group == null)
+            {
+                return NotFound("Could not find group with this id");
             }
             var post = _mapper.Map<Post>(model);
             post.DateTime = DateTime.Now.AddHours(2);

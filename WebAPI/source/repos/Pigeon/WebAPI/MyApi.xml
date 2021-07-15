@@ -126,7 +126,57 @@
         </member>
         <member name="M:WebAPI.Controllers.GroupController.CreateGroup(WebAPI.Models.Command.CreateGroupCommand)">
             <summary>
-            Creates a new group (WORK IN PROGRESS, need to somehow connect users to group)
+            Creates a new group
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.UpdateGroup(WebAPI.Models.Command.CreateGroupCommand,System.Int32)">
+            <summary>
+            Updates specified group
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.GetAllGroups">
+            <summary>
+            Get all groups
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.GetGroup(System.Int32)">
+            <summary>
+            Get specified group
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.DeleteGroup(System.Int32)">
+            <summary>
+            Deletes specified group
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.GetGroupAdmins(System.Int32)">
+            <summary>
+            Get specified group admins
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.GetGroupUsers(System.Int32)">
+            <summary>
+            Get specified group users
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.GetGroupMembers(System.Int32)">
+            <summary>
+            Get specified group all members (admins+users)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.AddUserToGroup(WebAPI.Models.Command.AddUserGroupCommand)">
+            <summary>
+            Adds new user to group (Possible UserType property values are "user" and "admin")
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.UpdateUserInGroup(WebAPI.Models.Command.AddUserGroupCommand)">
+            <summary>
+            Updates specified role of a user in a group (for example admin to user )
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.GroupController.RemoveUserFromGroup(System.Int32,System.Int32)">
+            <summary>
+            Removes user from group
             </summary>
         </member>
         <member name="T:WebAPI.Controllers.PostController">
@@ -168,6 +218,13 @@
         <member name="M:WebAPI.Controllers.PostController.GetUserAllPosts(System.Int32)">
             <summary>
             Gets all posts from specified user.
+            </summary>
+            <param name="id">The id<see cref="T:System.Int32"/>.</param>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;PostDto&gt;&gt;&gt;"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.GetGroupAllPosts(System.Int32)">
+            <summary>
+            Gets all posts from specified group.
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
             <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;PostDto&gt;&gt;&gt;"/>.</returns>
