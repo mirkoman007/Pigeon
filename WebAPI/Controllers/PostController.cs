@@ -53,7 +53,10 @@
             var post = _context.Posts.Find(id);
             if (post != null)
             {
-                return await Task.FromResult(Ok(_mapper.Map<PostDto>(post)));
+                var postFinal = _mapper.Map<PostDto>(post);
+                var user = _context.Users.Find(post.UserId);
+                postFinal.UserFirstLastName = user.FirstName + " " + user.LastName;
+                return await Task.FromResult(Ok(postFinal));
             }
             else
             {
