@@ -7,5 +7,7 @@ namespace WebAPI.Models.Command
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public int CreatorUserId { get; set; }
     }
 }

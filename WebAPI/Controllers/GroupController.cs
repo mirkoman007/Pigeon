@@ -39,7 +39,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Creates a new group
+        /// Creates a new group and adds specified user as a group admin
         /// </summary>
         [HttpPost]
         public ActionResult<GroupDto> CreateGroup([FromBody] CreateGroupCommand model)
@@ -51,10 +51,26 @@ namespace WebAPI.Controllers
             var group = _mapper.Map<Group>(model);
             group.DateTime = DateTime.Now.AddHours(2);
 
+            var user = _context.Users.Find(model.CreatorUserId);
+            if(user == null)
+            {
+                return NotFound("User with provided CreatorUserId does not exist");
+            }
+
+
             try
             {
                 _context.Groups.Add(group);
+                var userGroup = new UserGroup();
+                userGroup.UserType = 1;
+                userGroup.UserId = user.Iduser;
+
+
                 _context.SaveChanges();
+                userGroup.GroupId = group.Idgroup;
+                _context.UserGroups.Add(userGroup);
+                _context.SaveChanges();
+
                 var groupDto = new GroupDto();
                 groupDto.IDGroup = group.Idgroup;
                 groupDto.Name = group.Name;
@@ -245,10 +261,6 @@ namespace WebAPI.Controllers
                 return BadRequest("UserType property cannot be null (It has to be either user or admin)");
             }
             var userGroup = new UserGroup();
-            if(_context.Users.Find(model.UserId) == null)
-            {
-                return BadRequest("User with provided id does not exist");
-            }
             if (_context.Groups.Find(model.GroupId) == null)
             {
                 return BadRequest("Group with provided id does not exist");
@@ -269,6 +281,17 @@ namespace WebAPI.Controllers
             userGroup.UserId = model.UserId;
             userGroup.GroupId = model.GroupId;
 
+            var users = _context.Users.ToList();
+            if (!string.IsNullOrEmpty(model.UserFirstLastname))
+            {
+                foreach (var user in users)
+                {
+                    if(model.UserFirstLastname == (user.FirstName + ' ' + user.LastName))
+                    {
+                        userGroup.UserId = user.Iduser;
+                    }
+                }
+            }
 
             try
             {

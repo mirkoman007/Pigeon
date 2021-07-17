@@ -126,7 +126,7 @@
         </member>
         <member name="M:WebAPI.Controllers.GroupController.CreateGroup(WebAPI.Models.Command.CreateGroupCommand)">
             <summary>
-            Creates a new group
+            Creates a new group and adds specified user as a group admin
             </summary>
         </member>
         <member name="M:WebAPI.Controllers.GroupController.UpdateGroup(WebAPI.Models.Command.CreateGroupCommand,System.Int32)">
@@ -218,7 +218,7 @@
         </member>
         <member name="M:WebAPI.Controllers.MessageController.SeenMessage(System.Int32,System.Int32)">
             <summary>
-            Puts a seen datetime on all messages between two users (Only works for receiver)
+            Puts a seen datetime on all messages between two users (Only works for )
             </summary>
         </member>
         <member name="M:WebAPI.Controllers.MessageController.DeleteMessage(System.Int32)">
