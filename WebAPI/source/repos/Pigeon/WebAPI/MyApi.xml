@@ -166,7 +166,7 @@
         </member>
         <member name="M:WebAPI.Controllers.GroupController.AddUserToGroup(WebAPI.Models.Command.AddUserGroupCommand)">
             <summary>
-            Adds new user to group (Possible UserType property values are "user" and "admin")
+            Adds new user to group with either userId or first and last name(Possible UserType property values are "user" and "admin")
             </summary>
         </member>
         <member name="M:WebAPI.Controllers.GroupController.UpdateUserInGroup(WebAPI.Models.Command.AddUserGroupCommand)">

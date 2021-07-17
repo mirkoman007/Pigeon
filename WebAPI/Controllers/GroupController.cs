@@ -251,7 +251,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Adds new user to group (Possible UserType property values are "user" and "admin")
+        /// Adds new user to group with either userId or first and last name(Possible UserType property values are "user" and "admin")
         /// </summary>
         [HttpPost("add")]
         public IActionResult AddUserToGroup([FromBody] AddUserGroupCommand model)
@@ -282,14 +282,21 @@ namespace WebAPI.Controllers
             userGroup.GroupId = model.GroupId;
 
             var users = _context.Users.ToList();
+
             if (!string.IsNullOrEmpty(model.UserFirstLastname))
             {
+                bool foundUser = false;
                 foreach (var user in users)
                 {
                     if(model.UserFirstLastname == (user.FirstName + ' ' + user.LastName))
                     {
                         userGroup.UserId = user.Iduser;
+                        foundUser = true;
                     }
+                }
+                if (!foundUser)
+                {
+                    return NotFound("Cannot find user with this first and last name(for example: Ivan Ivic). First characters must be capital!");
                 }
             }
 
