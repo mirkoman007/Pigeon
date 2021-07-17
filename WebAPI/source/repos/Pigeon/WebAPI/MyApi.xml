@@ -179,6 +179,58 @@
             Removes user from group
             </summary>
         </member>
+        <member name="F:WebAPI.Controllers.MessageController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.MessageController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.ReportController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.SendMessage(WebAPI.Models.Command.SendMessageCommand)">
+            <summary>
+            Creates a new message to send (You can reference users either with their Id's or their full names in the request body model properties)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.GetMessages(System.Int32,System.Int32)">
+            <summary>
+            Get all messages between two users sorted by time they were sent
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.GetMessageUsers(System.Int32)">
+            <summary>
+            Get a list of users that messaged specified user and last message
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.SeenMessage(System.Int32)">
+            <summary>
+            Puts a seen datetime on specific message
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.SeenMessage(System.Int32,System.Int32)">
+            <summary>
+            Puts a seen datetime on all messages between two users (Only works for receiver)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.DeleteMessage(System.Int32)">
+            <summary>
+            Deletes a specific message
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.MessageController.UpdateMessage(System.Int32,WebAPI.Models.Command.UpdateMessageCommand)">
+            <summary>
+            Updates a specific message text
+            </summary>
+        </member>
         <member name="T:WebAPI.Controllers.PostController">
             <summary>
             Defines the <see cref="T:WebAPI.Controllers.PostController" />.
@@ -301,6 +353,23 @@
             </summary>
             <param name="id">The id<see cref="T:System.Int32"/>.</param>
             <returns>The <see cref="T:System.Threading.Tasks.Task`1"/>.</returns>
+        </member>
+        <member name="F:WebAPI.Controllers.ReportController._context">
+            <summary>
+            Defines the _context.
+            </summary>
+        </member>
+        <member name="F:WebAPI.Controllers.ReportController._mapper">
+            <summary>
+            Defines the _mapper.
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:WebAPI.Controllers.ReportController"/> class.
+            </summary>
+            <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
+            <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
         </member>
         <member name="F:WebAPI.Controllers.SecurePasswordHasher.SaltSize">
             <summary>
