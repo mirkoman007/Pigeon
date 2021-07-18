@@ -13,6 +13,7 @@ namespace WebApplication.Services
         Task<IList<Post>> GetUserPost(int id);
         Task<IList<Post>> GetFriendsUserPost(int id);
         Task AddPost(AddPost model);
+        Task UpdatePost(int postId,AddPost model);
 
     }
 
@@ -51,5 +52,9 @@ namespace WebApplication.Services
             await _httpService.Post("/api/post", model);
         }
 
+        public async Task UpdatePost(int postId, AddPost model)
+        {
+            await _httpService.Put($"/api/post/update/{postId}", model);
+        }
     }
 }

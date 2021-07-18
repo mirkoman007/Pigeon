@@ -34,6 +34,30 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade @ModalCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalStyle">
+    <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <EditForm class="form-group" Model="@model">
+                        <label for="message-text" class="col-form-label">Text:</label>
+                        <InputTextArea @bind-Value="model.Text" class="form-control" id="message-text"></InputTextArea>
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleModal">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="UpdatePost">Save changes</button>
+                </div>
+            </div>
+    </div>
+</div>
+
 
 @code {
 
@@ -65,6 +89,29 @@
         collapseModal = !collapseModal;
     }
 
+    //==================================Edit modal=========================================
+    private AddPost model = new AddPost();
+
+    protected override void OnInitialized()
+    {
+        model.Text = Post.Text;
+        model.UserId = Post.UserId;
+    }
+
+    private async void UpdatePost()
+    {
+        Post.Text = model.Text;
+        ToggleModal();
+        try
+        {
+            await PostService.UpdatePost(Post.IdPost, model);
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
     //===========================================================================
 
 
@@ -82,9 +129,9 @@
         {
             await PostService.DeletePost(Post.IdPost);
 
-            if(ReturnLocation==ReturnLocation.Home)
-                NavigationManager.NavigateTo($"",true);
-            else if(ReturnLocation==ReturnLocation.Profile)
+            if (ReturnLocation == ReturnLocation.Home)
+                NavigationManager.NavigateTo($"", true);
+            else if (ReturnLocation == ReturnLocation.Profile)
                 NavigationManager.NavigateTo($"profile/{Post.UserId}");
 
 
