@@ -48,3 +48,18 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+
+/*---------------custom---------------*/
+.post-profile {
+    float: left
+}
+
+.post-options {
+    float: right;
+}
+
+.post-content {
+    padding-top: 40px;
+    padding-bottom: 20px;
+}
