@@ -218,7 +218,7 @@
         </member>
         <member name="M:WebAPI.Controllers.MessageController.SeenMessage(System.Int32,System.Int32)">
             <summary>
-            Puts a seen datetime on all messages between two users (Only works for )
+            Puts a seen datetime on all messages between two users (Only puts seen for receiver)
             </summary>
         </member>
         <member name="M:WebAPI.Controllers.MessageController.DeleteMessage(System.Int32)">
@@ -370,6 +370,66 @@
             </summary>
             <param name="context">The context<see cref="T:WebAPI.Data.PigeonContext"/>.</param>
             <param name="mapper">The mapper<see cref="T:AutoMapper.IMapper"/>.</param>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.ReportComment(WebAPI.Models.Command.ReportCommand)">
+            <summary>
+            Comment report (Put CommentId value into ReportObjectId property of request body model)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetCommentReports">
+            <summary>
+            Get all comment reports
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.ReportMessage(WebAPI.Models.Command.ReportCommand)">
+            <summary>
+            Message report (Put MessageId value into ReportObjectId property of request body model)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetMessageReports">
+            <summary>
+            Get all message reports
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.ReportPost(WebAPI.Models.Command.ReportCommand)">
+            <summary>
+            Post report (Put PostId value into ReportObjectId property of request body model)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetPostReports">
+            <summary>
+            Get all message reports
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.ReportGroup(WebAPI.Models.Command.ReportCommand)">
+            <summary>
+            Group report (Put GroupId value into ReportObjectId property of request body model)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetGroupReports">
+            <summary>
+            Get all message reports
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.UserGroup(WebAPI.Models.Command.ReportCommand)">
+            <summary>
+            User report (Put UserId value into ReportObjectId property of request body model)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetUserReports">
+            <summary>
+            Get all user reports
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GiveWarning(WebAPI.Models.Command.WarningCommand)">
+            <summary>
+            Give warning
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.ReportController.GetUserWarnings(System.Int32)">
+            <summary>
+            Get all user warning
+            </summary>
         </member>
         <member name="F:WebAPI.Controllers.SecurePasswordHasher.SaltSize">
             <summary>
