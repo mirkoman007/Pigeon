@@ -5,7 +5,6 @@
 @inject IFriendService FriendService
 @inject IPostService PostService
 @inject IUserService UserService
-@inject NavigationManager NavigationManager
 
 
 @if (user != null)
@@ -127,16 +126,7 @@
             {
                 @foreach (var post in posts.OrderByDescending(p => p.DateTime))
                 {
-
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <p class="card-text"><a href="/profile/@post.UserId">@post.UserFirstLastName</a> (<a href="/post/@post.IdPost">@post.DateTime</a>)</p>
-                            <p class="card-text">@post.Text</p>
-                            <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
-                            <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
-                            <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-share" aria-hidden="true" /> Share</button>
-                        </div>
-                    </div>
+                    <PostComponent Post="post" ReturnLocation="ReturnLocation.Profile"></PostComponent>
                 }
             }
         }

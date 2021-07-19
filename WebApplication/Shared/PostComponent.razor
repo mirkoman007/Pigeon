@@ -1,0 +1,146 @@
+﻿@inject IAuthenticationService AuthenticationService
+@inject IPostService PostService
+@inject NavigationManager NavigationManager
+
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="post-profile">
+            <p class="card-text"><a href="/profile/@Post.UserId">@Post.UserFirstLastName</a> (<a href="/post/@Post.IdPost">@Post.DateTime</a>)</p>
+        </div>
+        <div class="post-options">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @onclick="ToggleDropdown"></button>
+                <div class="dropdown-menu @DropdownCssClass" aria-labelledby="dropdownMenuButton">
+                    @if (IsYourPost())
+                    {
+                        <a class="dropdown-item" @onclick="ToggleModal"><span class="oi oi-pencil" aria-hidden="true" /> Edit</a>
+                        <a class="dropdown-item" @onclick="DeletePost"><span class="oi oi-trash" aria-hidden="true" /> Delete</a>
+                    }
+                    else
+                    {
+                        <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="post-content">
+            <p class="card-text">@Post.Text</p>
+        </div>
+        <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
+        <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
+        <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-share" aria-hidden="true" /> Share</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade @ModalCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalStyle">
+    <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Edit post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <EditForm class="form-group" Model="@model">
+                        <label for="message-text" class="col-form-label">Text:</label>
+                        <InputTextArea @bind-Value="model.Text" class="form-control" id="message-text"></InputTextArea>
+                    </EditForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleModal">Close</button>
+                    <button type="button" class="btn btn-primary" @onclick="UpdatePost">Save changes</button>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public Post Post { get; set; }
+
+    [Parameter]
+    public ReturnLocation ReturnLocation { get; set; }
+
+    //===========================================================================
+    private bool collapseDropdown;
+
+    private string DropdownCssClass => collapseDropdown ? "show" : null;
+
+    private void ToggleDropdown()
+    {
+        collapseDropdown = !collapseDropdown;
+    }
+
+    //===========================================================================
+    //===========================================================================
+    private bool collapseModal;
+
+    private string ModalCssClass => collapseModal ? "show" : null;
+    private string ModalStyle => collapseModal ? "display: block;" : null;
+
+    private void ToggleModal()
+    {
+        collapseModal = !collapseModal;
+    }
+
+    //==================================Edit modal=========================================
+    private AddPost model = new AddPost();
+
+    protected override void OnInitialized()
+    {
+        model.Text = Post.Text;
+        model.UserId = Post.UserId;
+    }
+
+    private async void UpdatePost()
+    {
+        Post.Text = model.Text;
+        ToggleModal();
+        try
+        {
+            await PostService.UpdatePost(Post.IdPost, model);
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    //===========================================================================
+
+
+    private bool IsYourPost()
+    {
+        if (Post.UserId == AuthenticationService.User.IdUser)
+            return true;
+
+        return false;
+    }
+
+    private async void DeletePost()
+    {
+        try
+        {
+            await PostService.DeletePost(Post.IdPost);
+
+            if (ReturnLocation == ReturnLocation.Home)
+                NavigationManager.NavigateTo($"", true);
+            else if (ReturnLocation == ReturnLocation.Profile)
+                NavigationManager.NavigateTo($"profile/{Post.UserId}");
+
+
+        }
+        catch
+        {
+
+        }
+    }
+
+
+}
