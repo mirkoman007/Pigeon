@@ -263,7 +263,7 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Puts a seen datetime on all messages between two users (Only works for )
+        /// Puts a seen datetime on all messages between two users (Only puts seen for receiver)
         /// </summary>
         [HttpPost("{userReceiverId}/{userSenderId}/seen")]
         public ActionResult SeenMessage([FromRoute] int userReceiverId, [FromRoute] int userSenderId)

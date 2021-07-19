@@ -200,10 +200,13 @@
             {
                 return BadRequest("UserId property cannot be null");
             }
-            var group = _context.Groups.Find(model.GroupId);
-            if (group == null)
+            if(model.GroupId != null)
             {
-                return NotFound("Could not find group with this id");
+                var group = _context.Groups.Find(model.GroupId);
+                if (group == null)
+                {
+                    return NotFound("Could not find group with this id");
+                }
             }
             var post = _mapper.Map<Post>(model);
             post.DateTime = DateTime.Now.AddHours(2);
@@ -520,7 +523,6 @@
                     }
                 }
             }
-            post.DateTime = DateTime.Now.AddHours(2);
             try
             {
                 _context.Posts.Update(post);
