@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApplication.Models;
+using WebApplication.Models.Post;
 
 namespace WebApplication.Services
 {
@@ -14,6 +14,8 @@ namespace WebApplication.Services
         Task<IList<Post>> GetFriendsUserPost(int id);
         Task AddPost(AddPost model);
         Task UpdatePost(int postId,AddPost model);
+        Task AddComment(int postId, AddComment model);
+        Task<IList<Comment>> GetCommentById(int postId);
 
     }
 
@@ -55,6 +57,17 @@ namespace WebApplication.Services
         public async Task UpdatePost(int postId, AddPost model)
         {
             await _httpService.Put($"/api/post/update/{postId}", model);
+        }
+
+        public async Task AddComment(int postId, AddComment model)
+        {
+
+            await _httpService.Post($"/api/post/comment/{postId}", model);
+        }
+        public async Task<IList<Comment>> GetCommentById(int id)
+        {
+            return await _httpService.Get<IList<Comment>>($"/api/post/comment/{id}");
+
         }
     }
 }
