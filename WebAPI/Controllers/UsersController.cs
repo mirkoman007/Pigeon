@@ -1,14 +1,20 @@
 ﻿namespace WebAPI.Controllers
 {
     using AutoMapper;
+    using Azure.Storage.Blobs;
     using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Tokens;
+    using Microsoft.WindowsAzure.Storage;
     using System;
     using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
+    using System.IO;
     using System.Linq;
     using System.Security.Claims;
     using System.Text;
@@ -52,14 +58,20 @@
         /// </summary>
         private readonly AppSettings _appSettings;
 
+        private readonly IConfiguration _configuration;
+
+        private readonly IWebHostEnvironment _environment;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UsersController"/> class.
         /// </summary>
         /// <param name="context">The context<see cref="PigeonContext"/>.</param>
         /// <param name="mapper">The mapper<see cref="IMapper"/>.</param>
         /// <param name="appsettings">The appsettings<see cref="IOptions{AppSettings}"/>.</param>
-        public UsersController(PigeonContext context, IMapper mapper, IOptions<AppSettings> appsettings)
+        public UsersController(IWebHostEnvironment environment,IConfiguration configuration, PigeonContext context, IMapper mapper, IOptions<AppSettings> appsettings)
         {
+            _environment = environment;
+            _configuration = configuration;
             _context = context;
             _mapper = mapper;
             _appSettings = appsettings.Value;
@@ -366,6 +378,46 @@
             }
             user.UserTypeId = 2;
             return user;
+        }
+
+        /// <summary>
+        /// Upload a profile picture - Work in progress
+        /// </summary>
+        [AllowAnonymous]
+        [HttpPost("{IDUser}/profile")]
+        public async Task<ActionResult> PostProfilePicture([FromRoute] int IDUser)
+        {
+            var connectionString = _configuration.GetConnectionString("AzureStorageConnection");
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            string containerName = "profilePics";
+            BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+            try
+            {
+                var httpRequest = HttpContext.Request;
+                if(httpRequest.Form.Files.Count > 0)
+                {
+                    foreach (var file in httpRequest.Form.Files)
+                    {
+                        var filePath = Path.Combine(_environment.ContentRootPath, "uploads");
+                        if (!Directory.Exists(filePath))
+                            Directory.CreateDirectory(filePath);
+
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await file.CopyToAsync(memoryStream);
+                            System.IO.File.WriteAllBytes(Path.Combine(filePath,
+                                IDUser + "-profilePic-" +file.FileName), memoryStream.ToArray());
+                            
+                        }
+                        return Ok();
+                    }
+                }
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
         }
 
         /// <summary>

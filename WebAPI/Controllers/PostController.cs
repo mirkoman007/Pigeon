@@ -403,6 +403,44 @@
         }
 
         /// <summary>
+        /// Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+        /// </summary>
+        [HttpPost("reaction")]
+        public IActionResult AddPostReaction([FromBody] ReactionCommand model)
+        {
+            if (_context.Posts.Find(model.PostID) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            if (_context.Users.Find(model.UserID) == null)
+            {
+                return NotFound("User with this userId does not exist");
+            }
+            if (!_context.Reactions.Where(x => x.Value == model.ReactionName).Any())
+            {
+                return NotFound("Reaction with this name does not exist");
+            }
+            var allPostsReactions = _context.PostReactions.Where(x => x.PostId == model.PostID).ToList();
+            foreach (var item in allPostsReactions)
+            {
+                if (item.UserId == model.UserID)
+                {
+                    return BadRequest("Reaction to this post already exists from this user");
+                }
+            }
+            var postReaction = new PostReaction
+            {
+                PostId = model.PostID,
+                ReactionId = _context.Reactions.Where(x => x.Value == model.ReactionName).First().Idreaction,
+                UserId = model.UserID
+            };
+
+            _context.PostReactions.Add(postReaction);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        /// <summary>
         /// Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
         /// </summary>
         [HttpPut("reaction/{postId}/{userId}/{reactionName}")]
@@ -426,6 +464,37 @@
                 if (item.UserId == userId)
                 {
                     item.ReactionId = _context.Reactions.Where(x => x.Value == reactionName).First().Idreaction;
+                    _context.SaveChanges();
+                    return Ok();
+                }
+            }
+            return BadRequest("Error while trying to update post reaction");
+        }
+
+        /// <summary>
+        /// Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+        /// </summary>
+        [HttpPut("reaction")]
+        public IActionResult UpdatePostReaction([FromBody] ReactionCommand model)
+        {
+            if (_context.Posts.Find(model.PostID) == null)
+            {
+                return NotFound("Post with this postId does not exist");
+            }
+            if (_context.Users.Find(model.UserID) == null)
+            {
+                return NotFound("User with this userId does not exist");
+            }
+            if (!_context.Reactions.Where(x => x.Value == model.ReactionName).Any())
+            {
+                return NotFound("Reaction with this name does not exist");
+            }
+            var allPostsReactions = _context.PostReactions.Where(x => x.PostId == model.PostID).ToList();
+            foreach (var item in allPostsReactions)
+            {
+                if (item.UserId == model.UserID)
+                {
+                    item.ReactionId = _context.Reactions.Where(x => x.Value == model.ReactionName).First().Idreaction;
                     _context.SaveChanges();
                     return Ok();
                 }
@@ -501,8 +570,10 @@
             {
                 return BadRequest("UserId property cannot be null");
             }
+            var oldPostDatetime = _context.Posts.Find(id).DateTime;
             var post = _mapper.Map<Post>(model);
             post.Idpost = id;
+            post.DateTime = oldPostDatetime;
             if (!string.IsNullOrEmpty(model.MediaPath))
             {
                 var mediaCheck = _context.Media.SingleOrDefaultAsync(p => p.MediaPath == model.MediaPath);
@@ -525,7 +596,8 @@
             }
             try
             {
-                _context.Posts.Update(post);
+                var findPost = _context.Posts.Find(id);
+                findPost.Text = post.Text;
                 _context.SaveChanges();
                 return Ok();
             }
@@ -548,7 +620,11 @@
             {
                 return NotFound();
             }
-
+            var comments = _context.Comments.Where(x => x.PostId == id).ToList();
+            foreach (var item in comments)
+            {
+                _context.Comments.Remove(item);
+            }
             _context.Posts.Remove(post);
             await _context.SaveChangesAsync();
 

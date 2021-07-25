@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WebAPI.Data;
 using WebAPI.Models;
 using WebAPI.Models.Command;
@@ -153,7 +154,48 @@ namespace WebAPI.Controllers
             groupDto.Name = group.Name;
             groupDto.Decription = group.Description;
             groupDto.CreatedDateTime = group.DateTime;
-            return Ok(group);
+            return Ok(groupDto);
+        }
+
+        /// <summary>
+        /// Finds all group names that contain given string(specified in request body)
+        /// </summary>
+        /// <returns>The <see cref="Task{ActionResult{IEnumerable{SearchUserDto}}}"/>.</returns>
+        [HttpPost("search")]
+        public async Task<ActionResult<List<GroupDto>>> FindUsers([FromBody] SearchUserCommand command)
+        {
+            var searchWords = command.SearchString.Split(' ').ToList();
+            var allGroups = _context.Groups.ToList();
+            var groupDtos = new List<GroupDto>();
+            foreach (var group in allGroups)
+            {
+                var groupName = group.Name.Split(' ').ToList();
+                bool foundGroup = false;
+                foreach (var name in groupName)
+                {
+                    if(foundGroup == false)
+                    {
+                        foreach (var word in searchWords)
+                        {
+                            if(name.ToLower().StartsWith(word.ToLower()))
+                            {
+                                var groupFind = _context.Groups.Find(group.Idgroup);
+                                var groupDto = new GroupDto
+                                {
+                                    CreatedDateTime = groupFind.DateTime,
+                                    Decription = groupFind.Description,
+                                    IDGroup = groupFind.Idgroup,
+                                    Name = groupFind.Name
+                                };
+                                groupDtos.Add(groupDto);
+                                foundGroup = true;
+                            }
+                        }
+                    }
+                }
+                foundGroup = false;
+            }
+            return Ok(groupDtos);
         }
 
         /// <summary>
