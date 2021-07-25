@@ -25,7 +25,8 @@ namespace WebApplication
                 .AddScoped<IHttpService, HttpService>()
                 .AddScoped<ILocalStorageService, LocalStorageService>()
                 .AddScoped<IPostService, PostService>()
-                .AddScoped<IFriendService, FriendService>();
+                .AddScoped<IFriendService, FriendService>()
+                .AddScoped<IGroupService, GroupService>();
 
 
             builder.Services.AddScoped(x => {

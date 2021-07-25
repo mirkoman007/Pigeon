@@ -2,6 +2,7 @@
 @page "/search/{SearchString}"
 @attribute [Authorize]
 @inject IUserService UserService
+@inject IGroupService GroupService
 @inject NavigationManager NavigationManager
 
 
@@ -22,7 +23,7 @@
                 {
                     @foreach (var people in peoples)
                     {
-                        <li>@people.IdUser @people.FirstLastName @people.City</li>
+                        <li><a href="/profile/@people.IdUser">@people.FirstLastName</a> - @people.Gender - @people.City</li>
                     }
                 }
                 else
@@ -37,9 +38,26 @@
 <div class="card mt-4">
     <h4 class="card-header">Groups</h4>
     <div class="card-body">
-        <ul>
-            <li>"No result"</li>
-        </ul>
+        @if (groups == null)
+        {
+            <div class="spinner-border spinner-border-sm"></div>
+        }
+        else
+        {
+            <ul>
+                @if (groups.Count != 0)
+                {
+                    @foreach (var group in groups)
+                    {
+                        <li><a href="/group/@group.IdGroup">@group.Name</a> - @group.Decription</li>
+                    }
+                }
+                else
+                {
+                    <li>"No result"</li>
+                }
+            </ul>
+        }
     </div>
 </div>
 
@@ -48,6 +66,7 @@
     public string SearchString { get; set; }
 
     IList<SearchUser> peoples;
+    IList<SearchGroup> groups;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,10 +79,12 @@
         try
         {
             peoples = await UserService.Search(SearchString);
+            groups = await GroupService.Search(SearchString);
         }
         catch
         {
             peoples = new List<SearchUser>();
+            groups = new List<SearchGroup>();
         }
     }
 
