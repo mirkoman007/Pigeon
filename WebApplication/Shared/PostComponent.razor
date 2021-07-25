@@ -28,7 +28,12 @@
         <div class="post-content">
             <p class="card-text">@Post.Text</p>
         </div>
-        <button type="button" class="btn btn-success btn-sm"><span class="oi oi-thumb-up" aria-hidden="true" /> Like</button>
+
+        @if (!reactionLoading)
+        {
+            <button type="button" class="btn btn-success btn-sm" @onclick="LikePost"><span class="oi oi-thumb-up" aria-hidden="true" /> Like @reactions.Count</button>
+        }
+
         <button type="button" class="btn btn-outline-success btn-sm" @onclick="ToggleComments"><span class="oi oi-chat" aria-hidden="true" /> Comment</button>
         <button type="button" class="btn btn-outline-success btn-sm"><span class="oi oi-share" aria-hidden="true" /> Share</button>
 
@@ -84,24 +89,24 @@
 <!-- Modal -->
 <div class="modal fade @ModalCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalStyle">
     <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit post</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleModal">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <EditForm class="form-group" Model="@editPostModel">
-                        <label for="message-text" class="col-form-label">Text:</label>
-                        <InputTextArea @bind-Value="editPostModel.Text" class="form-control" id="message-text"></InputTextArea>
-                    </EditForm>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleModal">Close</button>
-                    <button type="button" class="btn btn-primary" @onclick="UpdatePost">Save changes</button>
-                </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit post</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <EditForm class="form-group" Model="@editPostModel">
+                    <label for="message-text" class="col-form-label">Text:</label>
+                    <InputTextArea @bind-Value="editPostModel.Text" class="form-control" id="message-text"></InputTextArea>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="UpdatePost">Save changes</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -119,8 +124,26 @@
 
     private bool commentLoading;
     private IList<Comment> comments;
-
     private bool displayedComments;
+
+    private bool reactionLoading = true;
+    private IList<Reaction> reactions;
+
+    private async void LikePost()
+    {
+        if (IsReact())
+        {
+            await PostService.DeleteReaction(Post.IdPost, AuthenticationService.User.IdUser);
+        }
+        else
+        {
+            await PostService.AddReaction(new AddReaction { PostID = Post.IdPost, UserID = AuthenticationService.User.IdUser, ReactionName = "like" });
+        }
+
+        reactions.Clear();
+        await LoadReactions();
+        StateHasChanged();
+    }
 
     private void ToggleComments()
     {
@@ -138,6 +161,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadComments();
+        await LoadReactions();
 
     }
 
@@ -146,6 +170,20 @@
         commentLoading = true;
         comments = await PostService.GetCommentById(Post.IdPost);
         commentLoading = false;
+    }
+
+    async Task LoadReactions()
+    {
+        reactionLoading = true;
+        try
+        {
+            reactions = await PostService.GetReactionById(Post.IdPost);
+        }
+        catch (Exception)
+        {
+            reactions = new List<Reaction>();
+        }
+        reactionLoading = false;
     }
 
 
@@ -230,4 +268,14 @@
 
     //===========================================================================
 
+    private bool IsReact()
+    {
+        foreach (var r in reactions)
+        {
+            if (r.UserID == AuthenticationService.User.IdUser)
+                return true;
+        }
+
+        return false;
+    }
 }

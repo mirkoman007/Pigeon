@@ -16,6 +16,9 @@ namespace WebApplication.Services
         Task UpdatePost(int postId,AddPost model);
         Task AddComment(int postId, AddComment model);
         Task<IList<Comment>> GetCommentById(int postId);
+        Task<IList<Reaction>> GetReactionById(int postId);
+        Task AddReaction(AddReaction model);
+        Task DeleteReaction(int postId, int userId);
 
     }
 
@@ -68,6 +71,21 @@ namespace WebApplication.Services
         {
             return await _httpService.Get<IList<Comment>>($"/api/post/comment/{id}");
 
+        }
+
+        public async Task<IList<Reaction>> GetReactionById(int postId)
+        {
+            return await _httpService.Get<IList<Reaction>>($"/api/post/reaction/{postId}");
+        }
+
+        public async Task AddReaction(AddReaction model)
+        {
+            await _httpService.Post("/api/post/reaction", model);
+        }
+
+        public async Task DeleteReaction(int postId, int userId)
+        {
+            await _httpService.Delete($"/api/post/reaction/{postId}/{userId}");
         }
     }
 }
