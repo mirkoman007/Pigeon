@@ -144,6 +144,12 @@
             Get specified group
             </summary>
         </member>
+        <member name="M:WebAPI.Controllers.GroupController.FindUsers(WebAPI.Models.Command.SearchUserCommand)">
+            <summary>
+            Finds all group names that contain given string(specified in request body)
+            </summary>
+            <returns>The <see cref="!:Task&lt;ActionResult&lt;IEnumerable&lt;SearchUserDto&gt;&gt;&gt;"/>.</returns>
+        </member>
         <member name="M:WebAPI.Controllers.GroupController.DeleteGroup(System.Int32)">
             <summary>
             Deletes specified group
@@ -324,7 +330,17 @@
             Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
             </summary>
         </member>
+        <member name="M:WebAPI.Controllers.PostController.AddPostReaction(WebAPI.Models.Command.ReactionCommand)">
+            <summary>
+            Adds reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+            </summary>
+        </member>
         <member name="M:WebAPI.Controllers.PostController.UpdatePostReaction(System.Int32,System.Int32,System.String)">
+            <summary>
+            Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
+            </summary>
+        </member>
+        <member name="M:WebAPI.Controllers.PostController.UpdatePostReaction(WebAPI.Models.Command.ReactionCommand)">
             <summary>
             Updates reaction to post(available reaction names:like, heart, laugh, surprised, sad, angry, smile)
             </summary>
@@ -501,7 +517,7 @@
             Defines the _appSettings.
             </summary>
         </member>
-        <member name="M:WebAPI.Controllers.UsersController.#ctor(WebAPI.Data.PigeonContext,AutoMapper.IMapper,Microsoft.Extensions.Options.IOptions{WebAPI.Data.AppSettings})">
+        <member name="M:WebAPI.Controllers.UsersController.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Configuration.IConfiguration,WebAPI.Data.PigeonContext,AutoMapper.IMapper,Microsoft.Extensions.Options.IOptions{WebAPI.Data.AppSettings})">
             <summary>
             Initializes a new instance of the <see cref="T:WebAPI.Controllers.UsersController"/> class.
             </summary>
@@ -578,6 +594,11 @@
             </summary>
             <param name="model">The model<see cref="T:WebAPI.Models.Command.RegisterUserCommand"/>.</param>
             <returns>The <see cref="T:WebAPI.Models.User"/>.</returns>
+        </member>
+        <member name="M:WebAPI.Controllers.UsersController.PostProfilePicture(System.Int32)">
+            <summary>
+            Upload a profile picture - Work in progress
+            </summary>
         </member>
         <member name="M:WebAPI.Controllers.UsersController.CreateUserWithGenderAndCityUpdate(WebAPI.Models.Command.UpdateUserCommand)">
             <summary>
