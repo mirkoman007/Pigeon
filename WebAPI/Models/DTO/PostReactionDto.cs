@@ -7,5 +7,7 @@
         public string ReactionName { get; set; }
 
         public string FirstLastName { get; set; }
+
+        public int? UserID { get; set; }
     }
 }

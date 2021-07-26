@@ -320,6 +320,14 @@ namespace WebAPI.Controllers
             {
                 return BadRequest("Invalid UserType property. Please put property value to admin or user");
             }
+            var allUserGroup = _context.UserGroups.ToList();
+            foreach (var ug in allUserGroup)
+            {
+                if (ug.GroupId == model.GroupId && ug.UserId == model.UserId)
+                {
+                    return BadRequest("Error, this user is already in this group");
+                }
+            }
             userGroup.UserId = model.UserId;
             userGroup.GroupId = model.GroupId;
 
@@ -332,6 +340,13 @@ namespace WebAPI.Controllers
                 {
                     if(model.UserFirstLastname == (user.FirstName + ' ' + user.LastName))
                     {
+                        foreach (var ug in allUserGroup)
+                        {
+                            if(ug.GroupId == model.GroupId && ug.UserId == user.Iduser)
+                            {
+                                return BadRequest("Error, this user is already in this group");
+                            }
+                        }
                         userGroup.UserId = user.Iduser;
                         foundUser = true;
                     }

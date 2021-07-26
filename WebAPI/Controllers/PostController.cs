@@ -551,7 +551,8 @@
                 {
                     FirstLastName = _context.Users.Find(item.UserId).FirstName + " " + _context.Users.Find(item.UserId).LastName,
                     IdPostReaction = item.IdpostReaction,
-                    ReactionName = _context.Reactions.Find(item.ReactionId).Value
+                    ReactionName = _context.Reactions.Find(item.ReactionId).Value,
+                    UserID = item.UserId
                 });
             }
             return Ok(postsFinal);
