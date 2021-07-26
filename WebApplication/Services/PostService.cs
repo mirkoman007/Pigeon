@@ -12,7 +12,9 @@ namespace WebApplication.Services
         Task DeletePost(int id);
         Task<IList<Post>> GetUserPost(int id);
         Task<IList<Post>> GetFriendsUserPost(int id);
+        Task<IList<Post>> GetGroupPost(int id);
         Task AddPost(AddPost model);
+        Task AddGroupPost(AddGroupPost model);
         Task UpdatePost(int postId,AddPost model);
         Task AddComment(int postId, AddComment model);
         Task<IList<Comment>> GetCommentById(int postId);
@@ -45,6 +47,11 @@ namespace WebApplication.Services
             return await _httpService.Get<IList<Post>>($"/api/post/user/{id}");
 
         }
+        public async Task<IList<Post>> GetGroupPost(int id)
+        {
+            return await _httpService.Get<IList<Post>>($"/api/post/group/{id}");
+
+        }
         public async Task<IList<Post>> GetFriendsUserPost(int id)
         {
             return await _httpService.Get<IList<Post>>($"/api/post/{id}/friends");
@@ -53,7 +60,12 @@ namespace WebApplication.Services
 
         public async Task AddPost(AddPost model)
         {
-            
+
+            await _httpService.Post("/api/post", model);
+        }
+        public async Task AddGroupPost(AddGroupPost model)
+        {
+
             await _httpService.Post("/api/post", model);
         }
 
