@@ -18,6 +18,7 @@ namespace WebApplication.Services
         Task RemoveGroupMember(int userId, int groupId);
         Task<Group> AddGroup(AddGroup model);
         Task UpdateGroup(int groupId,UpdateGroup model);
+        Task DeleteGroup(int groupId);
 
 
     }
@@ -78,6 +79,11 @@ namespace WebApplication.Services
         public async Task UpdateGroup(int groupId,UpdateGroup model)
         {
             await _httpService.Put($"/api/Group/{groupId}",model);
+        }
+
+        public async Task DeleteGroup(int groupId)
+        {
+            await _httpService.Delete($"/api/Group/{groupId}");
         }
     }
 }

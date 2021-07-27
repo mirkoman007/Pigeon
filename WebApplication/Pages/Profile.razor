@@ -130,7 +130,7 @@
             }
             else
             {
-                @foreach (var post in posts.OrderByDescending(p => p.DateTime))
+                @foreach (var post in posts.OrderByDescending(p => p.DateTime).Where(p=>p.GroupId==null))
                 {
                     <PostComponent Post="post" ReturnLocation="ReturnLocation.Profile"></PostComponent>
                 }

@@ -9,6 +9,6 @@ namespace WebApplication.Models.Group
     {
         public string Name { get; set; }
         public string Decription { get; set; }
-        public string CreatorUserId { get; set; }
+        public int CreatorUserId { get; set; }
     }
 }

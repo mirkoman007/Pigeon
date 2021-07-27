@@ -24,15 +24,19 @@
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @onclick="ToggleDropdown"></button>
                     <div class="dropdown-menu dropdown-menu-md-right @DropdownCssClass" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" @onclick="ToggleCreateGroupModal"><span class="oi oi-plus" aria-hidden="true" /> Create new group</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
                         @if (members != null && AreYouAdmin())
                         {
 
                             <a class="dropdown-item" @onclick="ToggleEditModal"><span class="oi oi-pencil" aria-hidden="true" /> Edit group</a>
                             <a class="dropdown-item" @onclick="ToggleAddModal"><span class="oi oi-plus" aria-hidden="true" /> Add members</a>
+                            <a class="dropdown-item" @onclick="DeleteGroup"><span class="oi oi-trash" aria-hidden="true" /> Delete group</a>
                         }
-                        <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
                         @if (members != null && AreYouMember())
                         {
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" @onclick="() => Remove(AuthenticationService.User.IdUser)"><span class="oi oi-account-logout" aria-hidden="true" /> Leave group</a>
                         }
                     </div>
@@ -42,6 +46,32 @@
         </div>
     </div>
 }
+
+<!-- Create group modal -->
+<div class="modal fade @ModalCreateGroupCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalCreateGroupStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new group</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleCreateGroupModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm class="form-group" Model="@createGroupModel">
+                    <label for="message-text" class="col-form-label">Group name:</label>
+                    <InputText @bind-Value="createGroupModel.Name" class="form-control" id="message-text"></InputText>
+                    <label for="message-text" class="col-form-label">Group description:</label>
+                    <InputText @bind-Value="createGroupModel.Decription" class="form-control" id="message-text"></InputText>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleCreateGroupModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="CreateGroup">Create group</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Edit group modal -->
 <div class="modal fade @ModalEditCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalEditStyle">
@@ -267,6 +297,7 @@
     private bool postBtnLoading;
     private string error;
 
+    private AddGroup createGroupModel = new AddGroup();
     private UpdateGroup editGroupModel = new UpdateGroup();
     private Model addModel = new Model();
 
@@ -471,6 +502,35 @@
         StateHasChanged();
     }
 
+    private async void CreateGroup()
+    {
+        createGroupModel.CreatorUserId = AuthenticationService.User.IdUser;
+        try
+        {
+            Group result=await GroupService.AddGroup(createGroupModel);
+            NavigationManager.NavigateTo($"/group/{result.IdGroup}");
+        }
+        catch (Exception)
+        {
+
+        }
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async void DeleteGroup()
+    {
+        try
+        {
+            await GroupService.DeleteGroup(GroupID);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
     private async void EditGroup()
     {
         ToggleEditModal();
@@ -518,6 +578,17 @@
     private void ToggleDropdown()
     {
         collapseDropdown = !collapseDropdown;
+    }
+
+    //===========================================================================
+    private bool collapseCreateGroupModal;
+
+    private string ModalCreateGroupCssClass => collapseCreateGroupModal ? "show" : null;
+    private string ModalCreateGroupStyle => collapseCreateGroupModal ? "display: block;" : null;
+
+    private void ToggleCreateGroupModal()
+    {
+        collapseCreateGroupModal = !collapseCreateGroupModal;
     }
 
     //===========================================================================
