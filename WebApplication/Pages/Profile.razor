@@ -5,6 +5,7 @@
 @inject IFriendService FriendService
 @inject IPostService PostService
 @inject IUserService UserService
+@inject NavigationManager NavigationManager
 
 
 @if (user != null)
@@ -23,6 +24,10 @@
                         @if (!yourProfile)
                         {
                             <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
+                            @if (AuthenticationService.User.UserType.Equals("Admin"))
+                            {
+                                <a class="dropdown-item" @onclick="DeleteAccount"><span class="oi oi-delete" aria-hidden="true" /> Delete this account</a>
+                            }
                         }
                     </div>
                 </div>
@@ -353,6 +358,21 @@
 
         }
     }
+
+
+    private async void DeleteAccount()
+    {
+        try
+        {
+            await UserService.DeleteUser(UserID);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
 
     //===========================================================================
     private bool collapseDropdown;

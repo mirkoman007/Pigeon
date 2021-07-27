@@ -14,7 +14,7 @@
             <ul>
                 @foreach (var user in users)
                 {
-                    <li>@user.IdUser @user.FirstName @user.LastName @user.Email @user.Gender @user.City @user.Birthday @user.CreateDateTime </li>
+                    <li>@user.IdUser <a href="/profile/@user.IdUser">@user.FirstName @user.LastName</a> @user.Email @user.Gender @user.City @user.Birthday @user.CreateDateTime </li>
                 }
             </ul>
         }
