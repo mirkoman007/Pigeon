@@ -67,3 +67,7 @@ a, .btn-link {
 .comment-write {
     margin-top: 20px;
 }
+
+.group-options {
+    float: right;
+}
