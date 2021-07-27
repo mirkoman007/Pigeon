@@ -12,6 +12,9 @@ namespace WebApplication.Services
         Task<IEnumerable<User>> GetAll();
         Task<User> GetUser(int id);
         Task<IList<SearchUser>> Search(string searchString);
+        Task UpdateUser(int userId, EditUser model);
+        Task DeleteUser(int userId);
+
     }
 
     public class UserService : IUserService
@@ -36,6 +39,16 @@ namespace WebApplication.Services
         {
             return await _httpService.Post<IList<SearchUser>>("/api/users/search", new { searchString });
 
+        }
+
+        public async Task UpdateUser(int userId, EditUser model)
+        {
+            await _httpService.Put($"/api/Users/{userId}", model);
+        }
+
+        public async Task DeleteUser(int userId)
+        {
+            await _httpService.Delete($"/api/Users/{userId}");
         }
     }
 }

@@ -1,0 +1,120 @@
+﻿@page "/settings"
+@inject IAuthenticationService AuthenticationService
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+
+
+
+<h3 class="mb-4">Settings</h3>
+
+
+<div class="row">
+    <div class="col-md-4 order-md-2 mb-4">
+        <div class="list-group">
+            <button type="button" class="list-group-item">Change password</button>
+            <button type="button" class="list-group-item list-group-item-danger" @onclick="DeleteAccount">Delete your account</button>
+        </div>
+    </div>
+    <div class="col-md-8 order-md-1">
+        <EditForm Model="@AuthenticationService.User" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="firstName">First name</label>
+                    <InputText @bind-Value="AuthenticationService.User.FirstName" class="form-control" required=""></InputText>
+                    <ValidationMessage For="@(() => AuthenticationService.User.FirstName)" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="lastName">Last name</label>
+                    <InputText @bind-Value="AuthenticationService.User.LastName" class="form-control" required=""></InputText>
+                    <ValidationMessage For="@(() => AuthenticationService.User.LastName)" />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <InputText @bind-Value="AuthenticationService.User.Email" class="form-control" required=""></InputText>
+                <ValidationMessage For="@(() => AuthenticationService.User.Email)" />
+            </div>
+            <div class="mb-3">
+                <label for="email">Birthday</label>
+                <InputDate @bind-Value="AuthenticationService.User.Birthday" type="date" min="1850-01-01" class="form-control" required=""></InputDate>
+                <ValidationMessage For="@(() => AuthenticationService.User.Birthday)" />
+            </div>
+            <div class="mb-3">
+                <label for="email">Gender</label>
+                <InputSelect @bind-Value="AuthenticationService.User.Gender" class="form-control">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => AuthenticationService.User.Gender)" />
+            </div>
+            <div class="mb-3">
+                <label for="email">City</label>
+                <InputText @bind-Value="AuthenticationService.User.City" class="form-control" required=""></InputText>
+            </div>
+            <hr class="mb-4">
+            @if (loading)
+            {
+                <button class="btn btn-primary btn-lg btn-block" type="submit"><span class="spinner-border spinner-border-sm mr-1" />Loading...</button>
+            }
+            else
+            {
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Save changes</button>
+            }
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger mt-3 mb-0">@error</div>
+            }
+        </EditForm>
+
+    </div>
+
+</div>
+
+@code {
+
+    private bool loading;
+    private string error;
+
+    private async void OnValidSubmit()
+    {
+        loading = true;
+        EditUser model = new EditUser
+        {
+            FirstName = AuthenticationService.User.FirstName,
+            LastName = AuthenticationService.User.LastName,
+            Email = AuthenticationService.User.Email,
+            Birthday = AuthenticationService.User.Birthday,
+            Gender = AuthenticationService.User.Gender,
+            City = AuthenticationService.User.City
+        };
+        try
+        {
+            await UserService.UpdateUser(AuthenticationService.User.IdUser, model);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            loading = false;
+            StateHasChanged();
+        }
+        loading = false;
+        StateHasChanged();
+    }
+
+
+    private async void DeleteAccount()
+    {
+        try
+        {
+            await UserService.DeleteUser(AuthenticationService.User.IdUser);
+            NavigationManager.NavigateTo("logout");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+
+}
