@@ -5,11 +5,35 @@
 @inject IFriendService FriendService
 @inject IPostService PostService
 @inject IUserService UserService
+@inject NavigationManager NavigationManager
 
 
 @if (user != null)
 {
-    <h3>@user.FirstName @user.LastName</h3>
+    <div class="row">
+        <div class="col-6">
+            <div class="user-info">
+                <h1>@user.FirstName @user.LastName</h1>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="user-options">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @onclick="ToggleDropdown"></button>
+                    <div class="dropdown-menu dropdown-menu-md-right @DropdownCssClass" aria-labelledby="dropdownMenuButton">
+                        @if (!yourProfile)
+                        {
+                            <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
+                            @if (AuthenticationService.User.UserType.Equals("Admin"))
+                            {
+                                <a class="dropdown-item" @onclick="DeleteAccount"><span class="oi oi-delete" aria-hidden="true" /> Delete this account</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
 
 @if (!yourProfile && friendsLoaded)
@@ -26,7 +50,7 @@
         {
             <button type="button" class="btn btn-outline-danger" @onclick="CancelFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Cancel friend request</button>
         }
-        else if(FriendRequestReceived())
+        else if (FriendRequestReceived())
         {
             <button type="button" class="btn btn-success" @onclick="AcceptFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Accept friend request</button>
             <button type="button" class="btn btn-outline-danger" @onclick="DeclineFriendRequest"><span class="oi oi-person" aria-hidden="true" /> Decline friend request</button>
@@ -130,7 +154,7 @@
             }
             else
             {
-                @foreach (var post in posts.OrderByDescending(p => p.DateTime))
+                @foreach (var post in posts.OrderByDescending(p => p.DateTime).Where(p => p.GroupId == null))
                 {
                     <PostComponent Post="post" ReturnLocation="ReturnLocation.Profile"></PostComponent>
                 }
@@ -226,7 +250,6 @@
 
     private bool IsYourFriend()
     {
-        //yourFriends.Where(f => f.UserId == UserID);
 
         foreach (var i in yourFriends)
         {
@@ -239,7 +262,7 @@
 
     private bool FriendRequestSent()
     {
-        foreach(var i in friendRequestSent)
+        foreach (var i in friendRequestSent)
         {
             if (i.UserResponderId == UserID)
                 return true;
@@ -250,7 +273,7 @@
 
     private bool FriendRequestReceived()
     {
-        foreach(var i in friendRequestReceived)
+        foreach (var i in friendRequestReceived)
         {
             if (i.UserRequestId == UserID)
                 return true;
@@ -279,7 +302,7 @@
     {
         try
         {
-            await FriendService.DeclineFriendRequest(UserID,AuthenticationService.User.IdUser);
+            await FriendService.DeclineFriendRequest(UserID, AuthenticationService.User.IdUser);
             await LoadFriends();
             StateHasChanged();
         }
@@ -336,4 +359,30 @@
         }
     }
 
+
+    private async void DeleteAccount()
+    {
+        try
+        {
+            await UserService.DeleteUser(UserID);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+
+    //===========================================================================
+    private bool collapseDropdown;
+
+    private string DropdownCssClass => collapseDropdown ? "show" : null;
+
+    private void ToggleDropdown()
+    {
+        collapseDropdown = !collapseDropdown;
+    }
+
+    //===========================================================================
 }

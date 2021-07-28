@@ -21,17 +21,16 @@
                     <span class="oi oi-home" aria-hidden="true" /> Home
                 </NavLink>
             </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="users">
-                    <span class="oi oi-people" aria-hidden="true" /> Users
-                </NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="counter">
-                    <span />
-                    <span class="oi oi-plus" aria-hidden="true" /> Counter
-                </NavLink>
-            </li>
+
+            @if (AuthenticationService.User.UserType.Equals("Admin"))
+            {
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="users">
+                        <span class="oi oi-people" aria-hidden="true" /> Users
+                    </NavLink>
+                </li>
+            }
+
         </ul>
         <ul class="navbar-nav ml-md-auto">
             <li class="nav-item dropdown @DropDownCssClass">
@@ -39,6 +38,7 @@
                 <div class="dropdown-menu dropdown-menu-md-right @DropDownCssClass" aria-labelledby="navbarDropdownMenuLink">
                     <NavLink class="dropdown-item" href="friendRequest"><span class="oi oi-people" aria-hidden="true" /> Friend request</NavLink>
                     <NavLink class="dropdown-item" href="profile"><span class="oi oi-person" aria-hidden="true" /> My profile</NavLink>
+                    <NavLink class="dropdown-item" href="settings"><span class="oi oi-wrench" aria-hidden="true" /> Settings</NavLink>
                     <div class="dropdown-divider"></div>
                     <NavLink class="dropdown-item" href="logout"><span class="oi oi-account-logout" aria-hidden="true" /> Logout</NavLink>
                 </div>

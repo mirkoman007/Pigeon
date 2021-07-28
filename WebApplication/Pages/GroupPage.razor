@@ -1,0 +1,622 @@
+﻿@page "/group/{GroupID:int}"
+@attribute [Authorize]
+@inject IGroupService GroupService
+@inject IPostService PostService
+@inject IAuthenticationService AuthenticationService
+@inject IFriendService FriendService
+@inject NavigationManager NavigationManager
+
+
+
+@if (group != null)
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="group-info">
+                <h1>@group.Name</h1>
+                <p>@group.Decription</p>
+            </div>
+
+        </div>
+        <div class="col-6">
+
+            <div class="group-options">
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" @onclick="ToggleDropdown"></button>
+                    <div class="dropdown-menu dropdown-menu-md-right @DropdownCssClass" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" @onclick="ToggleCreateGroupModal"><span class="oi oi-plus" aria-hidden="true" /> Create new group</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item"><span class="oi oi-warning" aria-hidden="true" /> Report</a>
+                        @if (members != null && AreYouAdmin())
+                        {
+
+                            <a class="dropdown-item" @onclick="ToggleEditModal"><span class="oi oi-pencil" aria-hidden="true" /> Edit group</a>
+                            <a class="dropdown-item" @onclick="ToggleAddModal"><span class="oi oi-plus" aria-hidden="true" /> Add members</a>
+                            <a class="dropdown-item" @onclick="DeleteGroup"><span class="oi oi-trash" aria-hidden="true" /> Delete group</a>
+                        }
+                        @if (members != null && AreYouMember())
+                        {
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" @onclick="() => Remove(AuthenticationService.User.IdUser)"><span class="oi oi-account-logout" aria-hidden="true" /> Leave group</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+<!-- Create group modal -->
+<div class="modal fade @ModalCreateGroupCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalCreateGroupStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create new group</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleCreateGroupModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm class="form-group" Model="@createGroupModel">
+                    <label for="message-text" class="col-form-label">Group name:</label>
+                    <InputText @bind-Value="createGroupModel.Name" class="form-control" id="message-text"></InputText>
+                    <label for="message-text" class="col-form-label">Group description:</label>
+                    <InputText @bind-Value="createGroupModel.Decription" class="form-control" id="message-text"></InputText>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleCreateGroupModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="CreateGroup">Create group</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit group modal -->
+<div class="modal fade @ModalEditCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalEditStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit group</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleEditModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <EditForm class="form-group" Model="@editGroupModel">
+                    <label for="message-text" class="col-form-label">Group name:</label>
+                    <InputText @bind-Value="editGroupModel.Name" class="form-control" id="message-text"></InputText>
+                    <label for="message-text" class="col-form-label">Group description:</label>
+                    <InputText @bind-Value="editGroupModel.Description" class="form-control" id="message-text"></InputText>
+                </EditForm>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleEditModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="EditGroup">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add members modal -->
+<div class="modal fade @ModalAddCssClass" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="@ModalAddStyle">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add members</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="ToggleAddModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @if (yourFriends != null)
+            {
+                <div class="modal-body">
+                    <EditForm class="form-group" Model="@addModel">
+                        <label for="message-text" class="col-form-label">Your friends:</label>
+                        <InputSelect class="form-control" @bind-Value="addModel.Id">
+                            @foreach (var f in yourFriends)
+                            {
+                                @if (!IsMember(f.UserId))
+                                {
+                                    <option value="@f.UserId">@f.FirstLastName</option>
+                                }
+                            }
+                        </InputSelect>
+                    </EditForm>
+                </div>
+
+            }
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="ToggleAddModal">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="AddUser">Add as user</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-8">
+        @if (members != null && AreYouMember())
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+                        <InputText @bind-Value="model.Text" class="form-control mb-3" placeholder="Your post here ....." />
+                        <button disabled="@postBtnLoading" class="btn btn-success btn-sm">
+                            @if (postBtnLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm mr-1"></span>}
+                            POST
+                        </button>
+                        @if (!string.IsNullOrEmpty(error))
+                        {
+                            <div class="alert alert-danger mt-3 mb-0">@error</div>
+                        }
+                    </EditForm>
+                </div>
+            </div>
+            @if (posts == null)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <div class="spinner-grow text-success" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @if (posts.Count == 0)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        <p>No posts 😥</p>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var post in posts.OrderByDescending(p => p.DateTime))
+                    {
+                        <PostComponent Post="post" ReturnLocation="ReturnLocation.Home"></PostComponent>
+                    }
+                }
+            }
+
+
+
+        }
+        else if (members != null)
+        {
+            <div class="alert alert-danger" role="alert">
+                <p>You are not group member</p>
+            </div>
+        }
+
+    </div>
+
+
+
+    <div class="col-md-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Admins</h5>
+                <ul class="list-group list-group-flush">
+                    @if (admins != null)
+                    {
+                        @foreach (var a in admins)
+                        {
+                            @if (AreYouAdmin())
+                            {
+                                <li class="list-group-item">
+                                    <a href="/profile/@a.IdUser">@a.FirstLastname</a>
+                                    <button class="btn btn-outline-danger btn-sm" @onclick="() => Demote(a.IdUser)"><span class="oi oi-arrow-thick-bottom" aria-hidden="true" /></button>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="list-group-item"><a href="/profile/@a.IdUser">@a.FirstLastname</a></li>
+                            }
+                        }
+                        @if (admins.Count == 0)
+                        {
+                            <li class="list-group-item">The group doesn't have admins.</li>
+                            @if (AreYouMember())
+                            {
+                                <button type="button" class="btn btn-outline-primary btn-lg btn-block" @onclick="BecomeAdmin">Become an admin</button>
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        @if (members != null && AreYouMember())
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Users</h5>
+                    <ul class="list-group list-group-flush">
+                        @if (users != null)
+                        {
+                            @foreach (var u in users)
+                            {
+                                @if (AreYouAdmin())
+                                {
+                                    <li class="list-group-item">
+                                        <a href="/profile/@u.IdUser">@u.FirstLastname</a>
+                                        <button class="btn btn-outline-success btn-sm" @onclick="() => Promote(u.IdUser)"><span class="oi oi-arrow-thick-top" aria-hidden="true" /></button>
+                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => Remove(u.IdUser)"><span class="oi oi-circle-x" aria-hidden="true" /></button>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="list-group-item"><a href="/profile/@u.IdUser">@u.FirstLastname</a></li>
+                                }
+                            }
+                            @if (users.Count == 0)
+                            {
+                                <li class="list-group-item">The group doesn't have users</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+        else if (members != null)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">How to join group ?</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">All groups on this platform are private. To join, you need to contact one of the administrators.</li>
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int GroupID { get; set; }
+
+    private Group group;
+
+    private IList<Post> posts;
+    private IList<Member> members;
+    private IList<Member> admins;
+    private IList<Member> users;
+
+    private AddGroupPost model = new AddGroupPost();
+    private bool postBtnLoading;
+    private string error;
+
+    private AddGroup createGroupModel = new AddGroup();
+    private UpdateGroup editGroupModel = new UpdateGroup();
+    private Model addModel = new Model();
+
+
+    private IList<Friend> yourFriends;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGroupInfo();
+        await LoadPosts();
+        await LoadMembers();
+        await LoadAdmins();
+        await LoadUsers();
+        await LoadFriends();
+    }
+
+
+    async Task LoadGroupInfo()
+    {
+        group = await GroupService.GetGroupById(GroupID);
+
+        editGroupModel.Name = group.Name;
+        editGroupModel.Description = group.Decription;
+    }
+
+    async Task LoadPosts()
+    {
+        try
+        {
+            posts = await PostService.GetGroupPost(GroupID);
+        }
+        catch
+        {
+            posts = new List<Post>();
+        }
+    }
+
+    async Task LoadMembers()
+    {
+        try
+        {
+            members = await GroupService.GetGroupMembers(GroupID);
+        }
+        catch
+        {
+            members = new List<Member>();
+        }
+    }
+
+    async Task LoadAdmins()
+    {
+        try
+        {
+            admins = await GroupService.GetGroupAdmins(GroupID);
+        }
+        catch
+        {
+            admins = new List<Member>();
+        }
+    }
+
+    async Task LoadUsers()
+    {
+        try
+        {
+            users = await GroupService.GetGroupUsers(GroupID);
+        }
+        catch
+        {
+            users = new List<Member>();
+        }
+    }
+
+    async Task LoadFriends()
+    {
+        try
+        {
+            yourFriends = await FriendService.GetAllFriends(AuthenticationService.User.IdUser);
+        }
+        catch
+        {
+            yourFriends = new List<Friend>();
+        }
+    }
+
+
+    private async void OnValidSubmit()
+    {
+        postBtnLoading = true;
+        try
+        {
+            model.UserId = AuthenticationService.User.IdUser;
+            model.GroupId = GroupID;
+            await PostService.AddGroupPost(model);
+            postBtnLoading = false;
+            posts.Clear();
+            await LoadPosts();
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            postBtnLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private bool AreYouMember()
+    {
+        foreach (var m in members)
+        {
+            if (m.IdUser == AuthenticationService.User.IdUser)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool IsMember(int userId)
+    {
+        foreach (var m in members)
+        {
+            if (m.IdUser == userId)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool AreYouAdmin()
+    {
+        foreach (var a in admins)
+        {
+            if (a.IdUser == AuthenticationService.User.IdUser)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void BecomeAdmin()
+    {
+        Promote(AuthenticationService.User.IdUser);
+    }
+
+    private async void Promote(int userId)
+    {
+        try
+        {
+            await GroupService.UpdateGroupMember(new AddMember { GroupId = GroupID, UserId = userId, UserType = "admin" });
+        }
+        catch (Exception)
+        {
+
+        }
+
+        admins.Clear();
+        users.Clear();
+        await LoadAdmins();
+        await LoadUsers();
+        StateHasChanged();
+    }
+
+    private async void Demote(int userId)
+    {
+        try
+        {
+            await GroupService.UpdateGroupMember(new AddMember { GroupId = GroupID, UserId = userId, UserType = "user" });
+        }
+        catch (Exception)
+        {
+
+        }
+
+        admins.Clear();
+        users.Clear();
+        await LoadAdmins();
+        await LoadUsers();
+        StateHasChanged();
+    }
+
+    private async void Remove(int userId)
+    {
+        try
+        {
+            await GroupService.RemoveGroupMember(userId, GroupID);
+        }
+        catch (Exception)
+        {
+
+        }
+
+        members.Clear();
+        admins.Clear();
+        users.Clear();
+        await LoadMembers();
+        await LoadAdmins();
+        await LoadUsers();
+        StateHasChanged();
+    }
+
+    private async void CreateGroup()
+    {
+        createGroupModel.CreatorUserId = AuthenticationService.User.IdUser;
+        try
+        {
+            Group result=await GroupService.AddGroup(createGroupModel);
+            NavigationManager.NavigateTo($"/group/{result.IdGroup}");
+        }
+        catch (Exception)
+        {
+
+        }
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async void DeleteGroup()
+    {
+        try
+        {
+            await GroupService.DeleteGroup(GroupID);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    private async void EditGroup()
+    {
+        ToggleEditModal();
+        try
+        {
+            await GroupService.UpdateGroup(GroupID, editGroupModel);
+        }
+        catch (Exception)
+        {
+
+        }
+        await LoadGroupInfo();
+        StateHasChanged();
+    }
+
+    private async void AddUser()
+    {
+        ToggleAddModal();
+
+        try
+        {
+            await GroupService.AddGroupMember(new AddMember { GroupId = GroupID, UserId = addModel.Id, UserType = "user" });
+        }
+        catch (Exception)
+        {
+
+        }
+
+        members.Clear();
+        admins.Clear();
+        users.Clear();
+        await LoadMembers();
+        await LoadAdmins();
+        await LoadUsers();
+        StateHasChanged();
+
+
+    }
+
+    //===========================================================================
+    private bool collapseDropdown;
+
+    private string DropdownCssClass => collapseDropdown ? "show" : null;
+
+    private void ToggleDropdown()
+    {
+        collapseDropdown = !collapseDropdown;
+    }
+
+    //===========================================================================
+    private bool collapseCreateGroupModal;
+
+    private string ModalCreateGroupCssClass => collapseCreateGroupModal ? "show" : null;
+    private string ModalCreateGroupStyle => collapseCreateGroupModal ? "display: block;" : null;
+
+    private void ToggleCreateGroupModal()
+    {
+        collapseCreateGroupModal = !collapseCreateGroupModal;
+    }
+
+    //===========================================================================
+    private bool collapseEditModal;
+
+    private string ModalEditCssClass => collapseEditModal ? "show" : null;
+    private string ModalEditStyle => collapseEditModal ? "display: block;" : null;
+
+    private void ToggleEditModal()
+    {
+        collapseEditModal = !collapseEditModal;
+    }
+
+    //===========================================================================
+    private bool collapseAddModal;
+
+    private string ModalAddCssClass => collapseAddModal ? "show" : null;
+    private string ModalAddStyle => collapseAddModal ? "display: block;" : null;
+
+    private void ToggleAddModal()
+    {
+        collapseAddModal = !collapseAddModal;
+    }
+
+    //===========================================================================
+
+    private class Model
+    {
+        public int Id { get; set; }
+    }
+}
