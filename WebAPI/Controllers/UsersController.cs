@@ -308,10 +308,14 @@
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
+            user.FirstName = "Deleted";
+            user.LastName = "User";
+            user.Birthday = DateTime.Now;
+            user.Email = "no mail";
+            user.CityId = 8;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
